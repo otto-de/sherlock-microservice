@@ -1,4 +1,5 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/otto-de/sherlock-microservice.svg)](https://pkg.go.dev/github.com/otto-de/sherlock-microservice)
+[![Go Report Card](https://goreportcard.com/badge/github.com/otto-de/sherlock-microservice)](https://goreportcard.com/report/github.com/otto-de/sherlock-microservice)
 
 # Microservice module for Sherlock
 
