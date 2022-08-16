@@ -1,3 +1,5 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/otto-de/sherlock-microservice.svg)](https://pkg.go.dev/github.com/otto-de/sherlock-microservice)
+
 # Microservice module for Sherlock
 
 Contains following Go packages:
