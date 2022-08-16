@@ -4,5 +4,6 @@ Contains following Go packages:
 
 | Package                  | Description |
 | ---                      | ---         |
-| [gcp](pkg/gcp)           | Combines all Google Cloud service that we use everywhere. |
+| [closer](pkg/closer)     | Handling for io.Closer instances |
 | [envflags](pkg/envflags) | Extends flags with Environment Variable handling. |
+| [gcp](pkg/gcp)           | Combines all Google Cloud service that we use everywhere. |
