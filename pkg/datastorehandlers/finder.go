@@ -39,7 +39,7 @@ func (f *FuzzyFinder) Close() {
 	}
 }
 
-func (f *FuzzyFinder) FindClosestToEpochMs(ctx context.Context, ancestorName string, epochMs int64, e interface{}) (*datastore.Key, error) {
+func (f *FuzzyFinder) FindClosestToEpochMs(ctx context.Context, ancestorName string, epochMs int64) (*datastore.Key, error) {
 
 	lowerName := fmt.Sprintf("%013d", epochMs-f.maxDeltaMs)
 	upperName := fmt.Sprintf("%013d", epochMs+f.maxDeltaMs)
