@@ -9,6 +9,7 @@ Contains following Go packages:
 
 | Package                  | Description |
 | ---                      | ---         |
-| [closer](pkg/closer)     | Handling for io.Closer instances |
+| [closer](pkg/closer)     | Handling for io.Closer instances. |
+| [datastorehandlers](pkg/datastorehandlers) | The way we interpret Entries in Datastore. |
 | [envflags](pkg/envflags) | Extends flags with Environment Variable handling. |
 | [gcp](pkg/gcp)           | Combines all Google Cloud service that we use everywhere. |
