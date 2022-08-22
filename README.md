@@ -13,3 +13,4 @@ Contains following Go packages:
 | [datastorehandlers](pkg/datastorehandlers) | The way we interpret Entries in Datastore. |
 | [envflags](pkg/envflags) | Extends flags with Environment Variable handling. |
 | [gcp](pkg/gcp)           | Combines all Google Cloud service that we use everywhere. |
+| [gke](pkg/gke)           | Ease working with Google Kubernetes Engine. |
