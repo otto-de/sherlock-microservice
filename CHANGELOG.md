@@ -3,6 +3,7 @@
 ## v0.0.5 - Migrate `dockerimage` to _sherlock-mavrodi_
 
 - Add function `dockerimage.BuildFromContainerfile` for building Container Image.
+- Add function `dockerimage.Push` for pushing a Container Image.
 
 **Bugfixes**
 - Correct docs of `StreamContainerLog`
