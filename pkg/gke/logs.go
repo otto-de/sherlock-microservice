@@ -13,7 +13,7 @@ import (
 
 var defaultConfigFlags = genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag().WithDiscoveryBurst(300).WithDiscoveryQPS(50.0)
 
-// StreamContainerLog streams all logsfrom
+// StreamContainerLog streams log for that one container to Stdout and Stderr.
 func StreamContainerLog(namespace string, pod *core.Pod, containerName string) error {
 	streams := genericclioptions.IOStreams{
 		In:     nil,
