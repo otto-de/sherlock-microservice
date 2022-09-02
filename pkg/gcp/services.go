@@ -16,8 +16,9 @@ type Services struct {
 	ErrorReporting *errorreporting.Client
 }
 
-// DiscoverServices builds clients for all Services that we use.
-func DiscoverServices(project, serviceName string) (*Services, error) {
+// NewLoggingClient creates a Client which also handles Errors
+// by simply writing to Stderr
+func NewLoggingClient(project string) (*logging.Client, error) {
 	loggingCtx := context.Background()
 	loggingClient, err := logging.NewClient(loggingCtx, project)
 	if err != nil {
@@ -27,6 +28,16 @@ func DiscoverServices(project, serviceName string) (*Services, error) {
 		fmt.Fprintf(os.Stderr, "Could not log due to error: %v", err)
 	}
 
+	return loggingClient, nil
+}
+
+// DiscoverServices builds clients for all Services that we use.
+func DiscoverServices(project, serviceName string) (*Services, error) {
+
+	loggingClient, err := NewLoggingClient(project)
+	if err != nil {
+		return nil, err
+	}
 	logger := loggingClient.Logger("ErrorReporting")
 
 	errorReportingCtx := context.Background()
