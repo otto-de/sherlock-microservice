@@ -69,7 +69,14 @@ func (f *FuzzyFinder) FindClosestToEpochMs(ctx context.Context, ancestorName str
 		return nil, err
 	}
 
-	return fuzzyMatch(foundKeys, epochMs, f.logger)
+	key, err := fuzzyMatch(foundKeys, epochMs, f.logger)
+	if key == nil && len(foundKeys) != 0 && f.logger != nil {
+		f.logger.Log(logging.Entry{
+			Severity: logging.Debug,
+			Payload:  fmt.Sprintf("Fuzzy matching matched no key of: %s", foundKeys),
+		})
+	}
+	return key, err
 }
 
 // fuzzyMatch searches `datastore.Key` `Name` that is numerically closest to `epochMs`.
