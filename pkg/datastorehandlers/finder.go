@@ -52,11 +52,11 @@ func (f *FuzzyFinder) FindClosestToEpochMs(ctx context.Context, ancestorName str
 	// To make all this easire to handle, we only support epochs around time.Now()
 	// Be explicit about not supporting too divergent epoch values.
 	if len(lowerName) != 13 {
-		return nil, fmt.Errorf("Not supported value due to digit count (%d): %s", len(lowerName), lowerName)
+		return nil, fmt.Errorf("not supported value due to digit count (%d): %s", len(lowerName), lowerName)
 	}
 
 	if len(upperName) != 13 {
-		return nil, fmt.Errorf("Not supported value due to digit count (%d): %s", len(upperName), upperName)
+		return nil, fmt.Errorf("not supported value due to digit count (%d): %s", len(upperName), upperName)
 	}
 
 	ancestor := datastore.NameKey(f.ancestorKind, ancestorName, nil)
