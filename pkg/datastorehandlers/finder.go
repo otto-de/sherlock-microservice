@@ -23,12 +23,16 @@ type FuzzyFinder struct {
 // NewFuzzyFinder creates a new FuzzyFinder.
 // Enforces a present logging.Client.
 func NewFuzzyFinder(client *datastore.Client, ancestorKind, kind string, maxDeltaMs int64, l *logging.Client) *FuzzyFinder {
+	var logger *logging.Logger
+	if l != nil {
+		logger = l.Logger("FuzzyFinder")
+	}
 	return &FuzzyFinder{
 		ancestorKind: ancestorKind,
 		client:       client,
 		kind:         kind,
 		maxDeltaMs:   maxDeltaMs,
-		logger:       l.Logger("FuzzyFinder"),
+		logger:       logger,
 	}
 }
 
