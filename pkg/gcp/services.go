@@ -16,7 +16,7 @@ import (
 type Services struct {
 	Logging        *logging.Client
 	ErrorReporting *errorreporting.Client
-	TraceProvider  *sdktrace.TracerProvider
+	TracerProvider *sdktrace.TracerProvider
 }
 
 // NewLoggingClient creates a Client which also handles Errors
@@ -35,7 +35,7 @@ func NewLoggingClient(project string) (*logging.Client, error) {
 }
 
 // DiscoverServices builds clients for all Services that we use.
-func DiscoverServices(project, serviceName string, traceProviderOptions []sdktrace.TracerProviderOption) (*Services, error) {
+func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption) (*Services, error) {
 
 	loggingClient, err := NewLoggingClient(project)
 	if err != nil {
@@ -64,12 +64,12 @@ func DiscoverServices(project, serviceName string, traceProviderOptions []sdktra
 		panic(err)
 	}
 
-	tp := sdktrace.NewTracerProvider(append(traceProviderOptions, sdktrace.WithBatcher(exporter))...)
+	tp := sdktrace.NewTracerProvider(append(tracerProviderOptions, sdktrace.WithBatcher(exporter))...)
 
 	return &Services{
 		Logging:        loggingClient,
 		ErrorReporting: errorClient,
-		TraceProvider:  tp,
+		TracerProvider: tp,
 	}, nil
 }
 
@@ -77,7 +77,7 @@ func DiscoverServices(project, serviceName string, traceProviderOptions []sdktra
 // Does **not** handle errors in close since there usually
 // is not much that can be done on Close failure anyway.
 func (s *Services) Close() {
-	s.TraceProvider.ForceFlush(context.Background()) // flushes any pending spans
+	s.TracerProvider.ForceFlush(context.Background()) // flushes any pending spans
 	s.ErrorReporting.Close()
 	s.Logging.Close()
 }
