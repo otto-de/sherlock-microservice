@@ -10,6 +10,25 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
+var (
+	// WithSasl enables everything deemed necessary to work with SASL
+	WithSasl = withSaslOption{}
+)
+
+// KafkaOption represents applying a set of options to flags
+type KafkaOption interface {
+	Apply(*KafkaFlags)
+}
+
+type withSaslOption struct{}
+
+// Apply adds all sasl. flags for Kafka
+func (o *withSaslOption) Apply(f *KafkaFlags) {
+	f.String("sasl.mechanisms", "SASL mechanism to use for authentication. Supported: GSSAPI, PLAIN, SCRAM-SHA-256, SCRAM-SHA-512, OAUTHBEARER. NOTE: Despite the name only one mechanism must be configured.")
+	f.String("sasl.username", "SASL username for use with the PLAIN and SASL-SCRAM-.. mechanisms")
+	f.String("sasl.password", "SASL password for use with the PLAIN and SASL-SCRAM-.. mechanisms")
+}
+
 // KafkaFlags contains a set of flags for configuring Kafka.
 type KafkaFlags struct {
 	configMap kafka.ConfigMap
@@ -20,11 +39,15 @@ type KafkaFlags struct {
 // ForKafka creates a helper object, which allows to create flags
 // connected to Kafka configuration.
 // Uses passed in Kafka configuration as a baseline.
-func ForKafka(configMap kafka.ConfigMap) *KafkaFlags {
-	return &KafkaFlags{
+func ForKafka(configMap kafka.ConfigMap, opts ...KafkaOption) *KafkaFlags {
+	f := &KafkaFlags{
 		configMap: configMap,
 		flags:     map[string]*string{},
 	}
+	for _, opt := range opts {
+		opt.Apply(f)
+	}
+	return f
 }
 
 // String creates String flag
