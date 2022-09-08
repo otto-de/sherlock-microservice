@@ -12,7 +12,9 @@ import (
 
 var (
 	// WithSasl enables everything deemed necessary to work with SASL
-	WithSasl = withSaslOption{}
+	WithSasl = &withSaslOption{}
+
+	_ KafkaOption = WithSasl
 )
 
 // KafkaOption represents applying a set of options to flags
