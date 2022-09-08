@@ -7,6 +7,8 @@ import (
 
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/logging"
+	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 // Services contains all Google Cloud Services that
@@ -14,6 +16,7 @@ import (
 type Services struct {
 	Logging        *logging.Client
 	ErrorReporting *errorreporting.Client
+	TraceProvider  *sdktrace.TracerProvider
 }
 
 // NewLoggingClient creates a Client which also handles Errors
@@ -32,7 +35,7 @@ func NewLoggingClient(project string) (*logging.Client, error) {
 }
 
 // DiscoverServices builds clients for all Services that we use.
-func DiscoverServices(project, serviceName string) (*Services, error) {
+func DiscoverServices(project, serviceName string, traceProviderOptions []sdktrace.TracerProviderOption) (*Services, error) {
 
 	loggingClient, err := NewLoggingClient(project)
 	if err != nil {
@@ -56,9 +59,17 @@ func DiscoverServices(project, serviceName string) (*Services, error) {
 		panic(err)
 	}
 
+	exporter, err := texporter.New(texporter.WithProjectID(project))
+	if err != nil {
+		panic(err)
+	}
+
+	tp := sdktrace.NewTracerProvider(append(traceProviderOptions, sdktrace.WithBatcher(exporter))...)
+
 	return &Services{
 		Logging:        loggingClient,
 		ErrorReporting: errorClient,
+		TraceProvider:  tp,
 	}, nil
 }
 
@@ -66,6 +77,7 @@ func DiscoverServices(project, serviceName string) (*Services, error) {
 // Does **not** handle errors in close since there usually
 // is not much that can be done on Close failure anyway.
 func (s *Services) Close() {
-	s.Logging.Close()
+	s.TraceProvider.ForceFlush(context.Background()) // flushes any pending spans
 	s.ErrorReporting.Close()
+	s.Logging.Close()
 }
