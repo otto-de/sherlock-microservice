@@ -1,7 +1,6 @@
 package gke
 
 import (
-	"os"
 	"strings"
 	"time"
 
@@ -14,12 +13,8 @@ import (
 var defaultConfigFlags = genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag().WithDiscoveryBurst(300).WithDiscoveryQPS(50.0)
 
 // StreamContainerLog streams log for that one container to Stdout and Stderr.
-func StreamContainerLog(namespace string, pod *core.Pod, containerName string) error {
-	streams := genericclioptions.IOStreams{
-		In:     nil,
-		Out:    os.Stdout,
-		ErrOut: os.Stderr,
-	}
+func StreamContainerLog(namespace string, pod *core.Pod, containerName string, streams genericclioptions.IOStreams) error {
+
 	lo := logs.NewLogsOptions(streams, false)
 	lo.Follow = true
 	lo.Container = containerName
