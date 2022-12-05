@@ -38,7 +38,7 @@ func NewPodRun(t *testing.T, clientset *kubernetes.Clientset, ctx context.Contex
 		Pod:  pod,
 		t:    t,
 	}
-	defer pr.logStreaming.Add(1)
+	pr.logStreaming.Add(1)
 	go func() {
 		defer pr.logStreaming.Done()
 		err := gke.StreamContainerLog(pod.Namespace, pod, "test")
