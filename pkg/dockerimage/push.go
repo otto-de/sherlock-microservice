@@ -16,8 +16,7 @@ const (
 
 // Push calls docker and pushes a tag.
 // Returns the remote digest for the pushed image.
-func Push(tag string) (string, error) {
-
+func PushWithWriters(tag string, out io.Writer, errOut io.Writer) (string, error) {
 	r, w := io.Pipe()
 	defer r.Close()
 	defer w.Close()
@@ -35,7 +34,7 @@ func Push(tag string) (string, error) {
 			return
 		}
 	}()
-	err := executeDockerCommandWithStdout(io.MultiWriter(os.Stdout, w), "push", tag)
+	err := executeDockerCommandWithWriters(io.MultiWriter(out, w), errOut, "push", tag)
 	if err != nil {
 		return "", err
 	}
@@ -44,6 +43,12 @@ func Push(tag string) (string, error) {
 	case d := <-digest:
 		return d, nil
 	default:
-		return "", errors.New("No digest in output found")
+		return "", errors.New("no digest in output found")
 	}
+}
+
+// Push calls docker and pushes a tag.
+// Returns the remote digest for the pushed image.
+func Push(tag string) (string, error) {
+	return PushWithWriters(tag, os.Stdout, os.Stderr)
 }

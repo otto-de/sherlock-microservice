@@ -2,14 +2,13 @@ package dockerimage
 
 import (
 	"io"
-	"os"
 	"os/exec"
 	"sync"
 )
 
-// executeDockerCommandWithStdout calls docker CLI with `arg`.
-// Ensures that output is written to provided `io.Writer`.
-func executeDockerCommandWithStdout(stdout io.Writer, arg ...string) error {
+// executeDockerCommandWithWriters calls docker CLI with `arg`.
+// Ensures that output is written to provided `io.Writer`s.
+func executeDockerCommandWithWriters(out io.Writer, errOut io.Writer, arg ...string) error {
 	cmd := exec.Command("docker", arg...)
 	errReader, err := cmd.StderrPipe()
 	if err != nil {
@@ -25,18 +24,13 @@ func executeDockerCommandWithStdout(stdout io.Writer, arg ...string) error {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		io.Copy(os.Stderr, errReader)
+		io.Copy(errOut, errReader)
 	}()
 	go func() {
 		defer wg.Done()
-		io.Copy(stdout, outReader)
+		io.Copy(out, outReader)
 	}()
 	err = cmd.Run()
 	wg.Wait()
 	return err
-}
-
-// executeDockerCommand call docker CLI with `arg`.
-func executeDockerCommand(arg ...string) error {
-	return executeDockerCommandWithStdout(os.Stdout, arg...)
 }
