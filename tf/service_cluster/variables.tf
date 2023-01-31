@@ -19,6 +19,11 @@ variable "network" {
   })
 }
 
+variable "release_channel_name" {
+  type    = string
+  default = "STABLE"
+}
+
 variable "subnetwork" {
   type = object({
     name = string

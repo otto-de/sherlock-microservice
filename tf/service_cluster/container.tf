@@ -10,7 +10,7 @@ resource "google_container_cluster" "main" {
   }
 
   release_channel {
-    channel = "STABLE"
+    channel = var.release_channel_name
   }
 
   location   = "europe-west1"
