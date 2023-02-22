@@ -21,9 +21,9 @@ resource "google_container_cluster" "main" {
 
   node_pool_auto_config {
     network_tags {
-      tags = [
+      tags = concat([
         "gke-keda-metrics",
-      ]
+      ], var.add_node_pool_network_tags)
     }
   }
 

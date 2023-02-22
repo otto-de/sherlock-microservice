@@ -1,3 +1,8 @@
+variable "add_node_pool_network_tags" {
+  type    = list(string)
+  default = []
+}
+
 variable "container_engine_version" {
   type = object({
     latest_master_version = string
