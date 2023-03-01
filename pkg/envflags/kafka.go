@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"cloud.google.com/go/logging"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
 
 var (
