@@ -3,6 +3,7 @@ module github.com/otto-de/sherlock-microservice
 go 1.18
 
 require (
+	cloud.google.com/go/compute v1.7.0
 	cloud.google.com/go/datastore v1.1.0
 	cloud.google.com/go/errorreporting v0.2.0
 	cloud.google.com/go/logging v1.5.0
@@ -23,7 +24,6 @@ require (
 
 require (
 	cloud.google.com/go v0.102.1 // indirect
-	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/trace v1.0.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd // indirect
