@@ -8,15 +8,18 @@ import (
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/logging"
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	"github.com/otto-de/sherlock-microservice/pkg/gke"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"google.golang.org/genproto/googleapis/api/monitoredres"
 )
 
 // Services contains all Google Cloud Services that
 // we use
 type Services struct {
-	Logging        *logging.Client
-	ErrorReporting *errorreporting.Client
-	TracerProvider *sdktrace.TracerProvider
+	Logging           *logging.Client
+	ErrorReporting    *errorreporting.Client
+	TracerProvider    *sdktrace.TracerProvider
+	MonitoredResource *monitoredres.MonitoredResource
 }
 
 // NewLoggingClient creates a Client which also handles Errors
@@ -34,8 +37,24 @@ func NewLoggingClient(project string) (*logging.Client, error) {
 	return loggingClient, nil
 }
 
+type discoveryOption struct {
+	clusterName   string
+	namespace     string
+	pod           string
+	containerName string
+}
+
+func WithKubernetes(clusterName, namespace, pod, containerName string) discoveryOption {
+	return discoveryOption{
+		clusterName:   clusterName,
+		namespace:     namespace,
+		pod:           pod,
+		containerName: containerName,
+	}
+}
+
 // DiscoverServices builds clients for all Services that we use.
-func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption) (*Services, error) {
+func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption, opts ...discoveryOption) (*Services, error) {
 
 	loggingClient, err := NewLoggingClient(project)
 	if err != nil {
@@ -66,11 +85,19 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 
 	tp := sdktrace.NewTracerProvider(append(tracerProviderOptions, sdktrace.WithBatcher(exporter))...)
 
-	return &Services{
+	s := &Services{
 		Logging:        loggingClient,
 		ErrorReporting: errorClient,
 		TracerProvider: tp,
-	}, nil
+	}
+
+	for _, opt := range opts {
+		if opt.pod != "" {
+			s.MonitoredResource = gke.MonitoredResource(s.Logging, project, opt.clusterName, opt.namespace, opt.pod, opt.containerName)
+		}
+	}
+
+	return s, nil
 }
 
 // Close closes all Clients that were created.
