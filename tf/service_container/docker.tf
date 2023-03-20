@@ -8,8 +8,9 @@ resource "docker_image" "main" {
   name = "${local.repository}/${var.name}:${var.tag}"
 
   build {
-    context    = var.build.context
-    dockerfile = var.build.dockerfile
+    context     = var.build.context
+    dockerfile  = var.build.dockerfile
+    pull_parent = true
   }
 
   triggers = {
