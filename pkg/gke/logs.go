@@ -18,7 +18,6 @@ func StreamContainerLog(namespace string, pod *core.Pod, containerName string, s
 	lo := logs.NewLogsOptions(streams, false)
 	lo.Follow = true
 	lo.Container = containerName
-	lo.IgnoreLogErrors = true
 	lo.Namespace = namespace
 	lo.ConsumeRequestFn = logs.DefaultConsumeRequest
 	lo.RESTClientGetter = defaultConfigFlags
