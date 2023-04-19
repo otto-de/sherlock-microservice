@@ -9,7 +9,6 @@ require (
 	cloud.google.com/go/logging v1.5.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
 	github.com/abcxyz/lumberjack/clients/go v0.0.0-20220808060808-545bd8eeb449
-	github.com/confluentinc/confluent-kafka-go/v2 v2.0.2
 	github.com/google/go-cmp v0.5.8
 	go.opentelemetry.io/otel/sdk v1.2.0
 	google.golang.org/api v0.92.0
