@@ -9,7 +9,9 @@ require (
 	cloud.google.com/go/logging v1.6.1
 	cloud.google.com/go/pubsub v1.27.1
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/propagator v0.37.1
 	github.com/google/go-cmp v0.5.9
+	go.opentelemetry.io/otel v1.14.0
 	go.opentelemetry.io/otel/sdk v1.2.0
 	google.golang.org/api v0.110.0
 	google.golang.org/genproto v0.0.0-20230209215440-0dfe4f8abfcc
@@ -74,11 +76,10 @@ require (
 	github.com/russross/blackfriday v1.5.2 // indirect
 	github.com/spf13/cobra v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.8.1 // indirect
+	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/xlab/treeprint v0.0.0-20181112141820-a009c3971eca // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.opentelemetry.io/otel v1.9.0 // indirect
-	go.opentelemetry.io/otel/trace v1.9.0 // indirect
+	go.opentelemetry.io/otel/trace v1.14.0 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
