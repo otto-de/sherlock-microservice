@@ -10,9 +10,15 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func NewPubSubStream(srv *pstest.Server, projectID, topicID, subscriptionID string) (*pubsub.Topic, *pubsub.Subscription, context.CancelFunc) {
+type PubSubStream struct {
+	Topic        *pubsub.Topic
+	Subscription *pubsub.Subscription
+	client       *pubsub.Client
+	conn         *grpc.ClientConn
+}
 
-	ctx, cancel := context.WithCancel(context.Background())
+func NewPubSubStreamWithContext(ctx context.Context, srv *pstest.Server, projectID, topicID, subscriptionID string) *PubSubStream {
+
 	conn, err := grpc.Dial(srv.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
@@ -39,11 +45,18 @@ func NewPubSubStream(srv *pstest.Server, projectID, topicID, subscriptionID stri
 	sub.ReceiveSettings.MaxOutstandingMessages = -1
 	sub.ReceiveSettings.MaxOutstandingBytes = -1
 
-	cancelFunc := func() {
-		cancel()
-		defer conn.Close()
-		defer client.Close()
-		defer topic.Delete(ctx)
+	return &PubSubStream{
+		Subscription: sub,
+		Topic:        topic,
+		client:       client,
+		conn:         conn,
 	}
-	return topic, sub, cancelFunc
+}
+
+func (s *PubSubStream) Close() error {
+	s.Topic.Delete(context.Background())
+	s.Subscription.Delete(context.Background())
+	s.client.Close()
+	s.conn.Close()
+	return nil
 }
