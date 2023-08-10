@@ -33,4 +33,11 @@ resource "google_container_cluster" "main" {
       enabled = true
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      dns_config,
+    ]
+  }
+
 }
