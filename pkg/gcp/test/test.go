@@ -25,6 +25,7 @@ type server struct {
 	listener     net.Listener
 	grpcServer   *grpc.Server
 	psServerConn *grpc.ClientConn
+	fes          *fakeErrorreportingServer
 }
 
 func MustMakeTestServices(ctx context.Context, project, serviceName string) *server {
@@ -41,7 +42,8 @@ func MustMakeTestServices(ctx context.Context, project, serviceName string) *ser
 	}
 
 	grpcServer := grpc.NewServer()
-	errorreportingpb.RegisterReportErrorsServiceServer(grpcServer, &fakeErrorreportingServer{})
+	fes := &fakeErrorreportingServer{}
+	errorreportingpb.RegisterReportErrorsServiceServer(grpcServer, fes)
 	loggingpb.RegisterLoggingServiceV2Server(grpcServer, loggingServer)
 	fakeServerAddr := l.Addr().String()
 
@@ -98,7 +100,12 @@ func MustMakeTestServices(ctx context.Context, project, serviceName string) *ser
 		PubSubServer: psServer,
 		listener:     l,
 		grpcServer:   grpcServer,
+		fes:          fes,
 	}
+}
+
+func (s *server) ReportedErrorEvents() []*errorreportingpb.ReportedErrorEvent {
+	return s.fes.ReportedEvents
 }
 
 func (s *server) Close() error {
