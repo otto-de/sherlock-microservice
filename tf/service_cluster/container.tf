@@ -34,6 +34,10 @@ resource "google_container_cluster" "main" {
     }
   }
 
+  gateway_api_config {
+    channel = "CHANNEL_STANDARD"
+  }
+
   lifecycle {
     ignore_changes = [
       dns_config,
