@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.34 Ease testing of PubSub
+- Add function `gcp.pubsubcmp.DiffMessages`.
+
 ## v0.0.5 - Migrate `dockerimage` to _sherlock-mavrodi_
 
 - Add function `dockerimage.BuildFromContainerfile` for building Container Image.
