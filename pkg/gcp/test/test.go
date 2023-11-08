@@ -120,9 +120,10 @@ func MustMakeTestServices(ctx context.Context, project, serviceName string, opts
 		},
 		PubSub:       pubSub,
 		PubSubServer: psServer,
-		listener:     l,
-		grpcServer:   grpcServer,
 		fes:          fes,
+		grpcServer:   grpcServer,
+		listener:     l,
+		psServerConn: psServerConn,
 	}
 }
 
