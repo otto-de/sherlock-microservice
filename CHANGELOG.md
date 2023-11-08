@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.39 More options for envflags
+- Add function `envflags.GetBoolDefault`
+
 ## v0.0.38 Further options for ErrorReporting
 - Add WithErrorReportCallback for testing Services.
 

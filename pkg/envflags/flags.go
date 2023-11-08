@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // GetStringDefault looks up Environment Variable for a key.
@@ -32,4 +33,20 @@ func GetIntDefault(envKey string, def int) int {
 		return i
 	}
 	return def
+}
+
+// GetBoolDefault looks up Environment Variable for a key.
+// Variable value will be checked for a non case sensitive
+// variation of the words true or false.
+// Panics if no variation found
+func GetBoolDefault(envKey string, def bool) bool {
+	v := os.Getenv(envKey)
+	if v == "" {
+		return def
+	} else if strings.ToLower(v) == "true" {
+		return true
+	} else if strings.ToLower(v) == "false" {
+		return false
+	}
+	panic(fmt.Sprintf("Provided value for Environment Variable %q is not a valid value for type bool: %s", envKey, v))
 }
