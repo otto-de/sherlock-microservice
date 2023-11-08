@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.36 Ease for ErrorReporting
+- Add WithErrorReportChannel for testing Services.
+
 ## v0.0.34 Ease testing of PubSub
 - Add function `gcp.pubsubcmp.DiffMessages`.
 

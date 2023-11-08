@@ -3,7 +3,6 @@ package test
 import (
 	"context"
 	"net"
-	"testing"
 
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/errorreporting/apiv1beta1/errorreportingpb"
@@ -30,22 +29,22 @@ type server struct {
 }
 
 type testServicesOption struct {
-	failOnErrorReports bool
+	c chan<- *errorreportingpb.ReportedErrorEvent
 }
 
-func WithFailOnErrorReports() testServicesOption {
+func WithErrorReportChannel(evs chan<- *errorreportingpb.ReportedErrorEvent) testServicesOption {
 	return testServicesOption{
-		failOnErrorReports: true,
+		c: evs,
 	}
 }
 
-func MustMakeTestServices(t *testing.T, ctx context.Context, project, serviceName string, opts ...testServicesOption) *server {
+func MustMakeTestServices(ctx context.Context, project, serviceName string, opts ...testServicesOption) *server {
 
 	var fes *fakeErrorreportingServer
 	for _, opt := range opts {
-		if opt.failOnErrorReports {
+		if opt.c != nil {
 			fes = &fakeErrorreportingServer{
-				tForFailOnEvent: t,
+				c: opt.c,
 			}
 		}
 	}
