@@ -28,13 +28,24 @@ type server struct {
 	fes          *fakeErrorreportingServer
 }
 
+type ReportErrorFunc func(ctx context.Context, req *errorreportingpb.ReportErrorEventRequest) (*errorreportingpb.ReportErrorEventResponse, error)
+
 type testServicesOption struct {
-	c chan<- *errorreportingpb.ReportedErrorEvent
+	f ReportErrorFunc
 }
 
 func WithErrorReportChannel(evs chan<- *errorreportingpb.ReportedErrorEvent) testServicesOption {
 	return testServicesOption{
-		c: evs,
+		f: func(ctx context.Context, req *errorreportingpb.ReportErrorEventRequest) (*errorreportingpb.ReportErrorEventResponse, error) {
+			evs <- req.Event
+			return &errorreportingpb.ReportErrorEventResponse{}, nil
+		},
+	}
+}
+
+func WithErrorReportCallback(f ReportErrorFunc) testServicesOption {
+	return testServicesOption{
+		f: f,
 	}
 }
 
@@ -42,9 +53,9 @@ func MustMakeTestServices(ctx context.Context, project, serviceName string, opts
 
 	var fes *fakeErrorreportingServer
 	for _, opt := range opts {
-		if opt.c != nil {
+		if opt.f != nil {
 			fes = &fakeErrorreportingServer{
-				c: opt.c,
+				f: opt.f,
 			}
 		}
 	}
@@ -125,10 +136,6 @@ func MustMakeTestServices(ctx context.Context, project, serviceName string, opts
 		listener:     l,
 		psServerConn: psServerConn,
 	}
-}
-
-func (s *server) ReportedErrorEvents() []*errorreportingpb.ReportedErrorEvent {
-	return s.fes.ReportedEvents
 }
 
 func (s *server) Close() error {

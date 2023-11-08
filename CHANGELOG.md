@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.38 Further options for ErrorReporting
+- Add WithErrorReportCallback for testing Services.
+
 ## v0.0.36 Ease for ErrorReporting
 - Add WithErrorReportChannel for testing Services.
 

@@ -11,14 +11,12 @@ var (
 )
 
 type fakeErrorreportingServer struct {
-	c              chan<- *errorreportingpb.ReportedErrorEvent
-	ReportedEvents []*errorreportingpb.ReportedErrorEvent
+	f ReportErrorFunc
 }
 
 func (s *fakeErrorreportingServer) ReportErrorEvent(ctx context.Context, req *errorreportingpb.ReportErrorEventRequest) (*errorreportingpb.ReportErrorEventResponse, error) {
-	if s.c != nil {
-		s.c <- req.Event
+	if s.f != nil {
+		return s.f(ctx, req)
 	}
-	s.ReportedEvents = append(s.ReportedEvents, req.Event)
 	return &errorreportingpb.ReportErrorEventResponse{}, nil
 }
