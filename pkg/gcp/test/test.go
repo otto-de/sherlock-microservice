@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"net"
+	"testing"
 
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/errorreporting/apiv1beta1/errorreportingpb"
@@ -28,7 +29,30 @@ type server struct {
 	fes          *fakeErrorreportingServer
 }
 
-func MustMakeTestServices(ctx context.Context, project, serviceName string) *server {
+type testServicesOption struct {
+	failOnErrorReports bool
+}
+
+func WithFailOnErrorReports() testServicesOption {
+	return testServicesOption{
+		failOnErrorReports: true,
+	}
+}
+
+func MustMakeTestServices(t *testing.T, ctx context.Context, project, serviceName string, opts ...testServicesOption) *server {
+
+	var fes *fakeErrorreportingServer
+	for _, opt := range opts {
+		if opt.failOnErrorReports {
+			fes = &fakeErrorreportingServer{
+				tForFailOnEvent: t,
+			}
+		}
+	}
+
+	if fes == nil {
+		fes = &fakeErrorreportingServer{}
+	}
 
 	l, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
@@ -42,7 +66,6 @@ func MustMakeTestServices(ctx context.Context, project, serviceName string) *ser
 	}
 
 	grpcServer := grpc.NewServer()
-	fes := &fakeErrorreportingServer{}
 	errorreportingpb.RegisterReportErrorsServiceServer(grpcServer, fes)
 	loggingpb.RegisterLoggingServiceV2Server(grpcServer, loggingServer)
 	fakeServerAddr := l.Addr().String()
