@@ -9,6 +9,7 @@ import (
 	"cloud.google.com/go/logging"
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/otto-de/sherlock-microservice/pkg/gke"
+	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 )
@@ -38,10 +39,11 @@ func NewLoggingClient(project string) (*logging.Client, error) {
 }
 
 type discoveryOption struct {
-	clusterName   string
-	namespace     string
-	pod           string
-	containerName string
+	clusterName             string
+	containerName           string
+	namespace               string
+	pod                     string
+	gkeAutoDiscoverMetaData bool
 }
 
 func WithKubernetes(clusterName, namespace, pod, containerName string) discoveryOption {
@@ -53,9 +55,36 @@ func WithKubernetes(clusterName, namespace, pod, containerName string) discovery
 	}
 }
 
+func WithGKEAutoDiscoverMetaData() discoveryOption {
+	/*
+		This option will try to auto discover available metadata from the Google Cloud metadata service and environment variables.
+		For the container name it will use the environment variable CONTAINER_NAME.
+		For the pod name it will use the environment variable POD_NAME.
+		For the namespace it will use the environment variable NAMESPACE.
+		These variables cant be fetched from the metadata service.
+		Set the environment variables in the deployment manifest.
+
+		- name: POD_NAME
+			valueFrom:
+			fieldRef:
+				fieldPath: metadata.name
+		- name: POD_NAMESPACE
+			valueFrom:
+			fieldRef:
+				fieldPath: metadata.namespace
+		- name: CONTAINER_NAME
+			value: test-container
+
+		If the container name is equal to the pod name you might use the same field for both.
+
+	*/
+	return discoveryOption{
+		gkeAutoDiscoverMetaData: true,
+	}
+}
+
 // DiscoverServices builds clients for all Services that we use.
 func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption, opts ...discoveryOption) (*Services, error) {
-
 	loggingClient, err := NewLoggingClient(project)
 	if err != nil {
 		return nil, err
@@ -83,19 +112,36 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 		panic(err)
 	}
 
-	tp := sdktrace.NewTracerProvider(append(tracerProviderOptions, sdktrace.WithBatcher(exporter))...)
-
 	s := &Services{
 		Logging:        loggingClient,
 		ErrorReporting: errorClient,
-		TracerProvider: tp,
 	}
 
+	var traceResource *resource.Resource
 	for _, opt := range opts {
-		if opt.pod != "" {
+		if opt.gkeAutoDiscoverMetaData {
+			metadata, err := gke.GetMetaData()
+			if err != nil {
+				defer logger.Flush()
+
+				logger.Log(logging.Entry{
+					Severity: logging.Info,
+					Payload:  fmt.Sprintf("Error getting MetaData: %s", err),
+				})
+				continue
+			}
+
+			s.MonitoredResource = gke.MonitoredResourceFromMetaData(metadata)
+			traceResource = gke.TraceResourceFromMetaData(serviceName, metadata)
+		} else if opt.pod != "" {
 			s.MonitoredResource = gke.MonitoredResource(s.Logging, project, opt.clusterName, opt.namespace, opt.pod, opt.containerName)
 		}
 	}
+	if traceResource != nil {
+		tracerProviderOptions = append(tracerProviderOptions, sdktrace.WithResource(traceResource))
+	}
+
+	s.TracerProvider = sdktrace.NewTracerProvider(append(tracerProviderOptions, sdktrace.WithBatcher(exporter))...)
 
 	return s, nil
 }
