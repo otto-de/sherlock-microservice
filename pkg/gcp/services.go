@@ -58,6 +58,7 @@ func WithKubernetes(clusterName, namespace, pod, containerName string) discovery
 func WithGKEAutoDiscoverMetaData() discoveryOption {
 	/*
 		This option will try to auto discover available metadata from the Google Cloud metadata service and environment variables.
+		The metadata will be used to create the monitored resource and trace resource.
 		For the container name it will use the environment variable CONTAINER_NAME.
 		For the pod name it will use the environment variable POD_NAME.
 		For the namespace it will use the environment variable NAMESPACE.
@@ -66,17 +67,14 @@ func WithGKEAutoDiscoverMetaData() discoveryOption {
 
 		- name: POD_NAME
 			valueFrom:
-			fieldRef:
-				fieldPath: metadata.name
+				fieldRef:
+					fieldPath: metadata.name
 		- name: POD_NAMESPACE
 			valueFrom:
-			fieldRef:
-				fieldPath: metadata.namespace
+				fieldRef:
+					fieldPath: metadata.namespace
 		- name: CONTAINER_NAME
 			value: test-container
-
-		If the container name is equal to the pod name you might use the same field for both.
-
 	*/
 	return discoveryOption{
 		gkeAutoDiscoverMetaData: true,
