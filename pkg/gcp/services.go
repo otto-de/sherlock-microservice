@@ -120,8 +120,6 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 		if opt.gkeAutoDiscoverMetaData {
 			metadata, err := gke.GetMetaData()
 			if err != nil {
-				defer logger.Flush()
-
 				logger.Log(logging.Entry{
 					Severity: logging.Info,
 					Payload:  fmt.Sprintf("Error getting MetaData: %s", err),
