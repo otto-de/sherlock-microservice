@@ -38,6 +38,8 @@ resource "google_container_cluster" "main" {
     channel = "CHANNEL_STANDARD"
   }
 
+  deletion_protection = var.deletion_protection
+
   lifecycle {
     ignore_changes = [
       dns_config,
