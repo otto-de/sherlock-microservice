@@ -17,6 +17,15 @@ variable "container_engine_version" {
   })
 }
 
+variable "enable_monitoring_components" {
+  type        = list(string)
+  default     = ["SYSTEM_COMPONENTS"]
+  description = <<EOF
+The GKE components exposing metrics.
+Supported values include: `SYSTEM_COMPONENTS`, `APISERVER`, `SCHEDULER`, `CONTROLLER_MANAGER`, `STORAGE`, `HPA`, `POD`, `DAEMONSET`, `DEPLOYMENT` and `STATEFULSET`
+EOF
+}
+
 variable "master_cidr_block" {
   type = string
 }

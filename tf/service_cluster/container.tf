@@ -46,4 +46,8 @@ resource "google_container_cluster" "main" {
     ]
   }
 
+  monitoring_config {
+    enable_components = var.enable_monitoring_components
+  }
+
 }
