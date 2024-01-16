@@ -17,9 +17,16 @@ func WithOrderingKey(orderingKey string) Option {
 	}
 }
 
+type PublishError interface {
+	errorreports.Error
+
+	// IsACK returns true if recipient acknowledged the event.
+	IsACK() bool
+}
+
 type Publisher[EV any] interface {
 	// Publish publishes an Event to Target.
-	Publish(ctx context.Context, event *EV, opts ...Option) errorreports.Error
+	Publish(ctx context.Context, event *EV, opts ...Option) PublishError
 }
 
 // ApplyCloudEventsPubSubOrderingKey extracts a OrderingKey from Options and
