@@ -109,3 +109,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
+
+replace github.com/cloudevents/sdk-go/protocol/pubsub/v2 => github.com/abergmeier/cloudevents-sdk-go/protocol/pubsub/v2 v2.14.1
