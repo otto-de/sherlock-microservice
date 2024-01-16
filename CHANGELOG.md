@@ -1,10 +1,12 @@
 # Changelog
 
+## v0.0.45 Accessing OrderingKey from callsites
+
 ## v0.0.44 ErrorReporting
-- Add `errorreports.Error`
+- Add interface `errorreports.Error`
 
   Special error interface so that it is possible to generate a GCP ErrorReport directly from `error`.
-- Add `publisher.Publisher`
+- Add interface `publisher.Publisher`
 
   Use `Publisher` for rich publish integration. Resulting error can directly be used for GCP ErrorReporting.
 
