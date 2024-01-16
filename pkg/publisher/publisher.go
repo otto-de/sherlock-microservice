@@ -30,5 +30,5 @@ func ApplyCloudEventsPubSubOrderingKey(ctx context.Context, opts ...Option) cont
 			ctx = cepubsub.WithOrderingKey(ctx, opt.orderingKey)
 		}
 	}
-	return nil
+	return ctx
 }

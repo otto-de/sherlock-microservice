@@ -1,6 +1,11 @@
 # Changelog
 
+## v0.0.47 Fix accessing OrderingKey
+**Bugfixes**
+- Corrects implementation of function `ApplyCloudEventsPubSubOrderingKey`
+
 ## v0.0.45 Accessing OrderingKey from callsites
+- Add function `ApplyCloudEventsPubSubOrderingKey`
 
 ## v0.0.44 ErrorReporting
 - Add interface `errorreports.Error`
