@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.44 ErrorReporting
+- Add `errorreports.Error`
+
+  Special error interface so that it is possible to generate a GCP ErrorReport directly from `error`.
+- Add `publisher.Publisher`
+
+  Use `Publisher` for rich publish integration. Resulting error can directly be used for GCP ErrorReporting.
+
 ## v0.0.39 More options for envflags
 - Add function `envflags.GetBoolDefault`
 
