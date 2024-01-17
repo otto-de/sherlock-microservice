@@ -2,9 +2,13 @@ package publisher
 
 import (
 	"context"
+	"fmt"
 
+	"cloud.google.com/go/errorreporting"
 	cepubsub "github.com/cloudevents/sdk-go/protocol/pubsub/v2"
 	"github.com/otto-de/sherlock-microservice/pkg/gcp/errorreports"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Option struct {
@@ -38,4 +42,42 @@ func ApplyCloudEventsPubSubOrderingKey(ctx context.Context, opts ...Option) cont
 		}
 	}
 	return ctx
+}
+
+// PanicPublisher wraps a Publisher.
+// Panics if publishing fails.
+type PanicPublisher[EV any] struct {
+	er   *errorreporting.Client
+	base Publisher[EV]
+}
+
+func NewPanicPublisher[EV any](er *errorreporting.Client, base Publisher[EV]) *PanicPublisher[EV] {
+	return &PanicPublisher[EV]{
+		er:   er,
+		base: base,
+	}
+}
+
+func (p *PanicPublisher[EV]) PublishWithNACKPanic(ctx context.Context, event *EV, opts ...Option) errorreports.Error {
+	publishErr := p.base.Publish(ctx, event, opts...)
+	if publishErr != nil {
+		return nil
+	}
+	span := trace.SpanFromContext(ctx)
+	span.SetStatus(codes.Error, "Send failed")
+	span.RecordError(publishErr)
+	if publishErr.IsACK() {
+		p.er.Report(errorreporting.Entry{
+			Error: publishErr,
+		})
+	} else {
+		p.er.ReportSync(ctx, errorreporting.Entry{
+			Error: publishErr,
+		})
+		// For now we do not recover here but just panic
+		// TODO: Optimally we should introduce circuit breakers instead
+		panicErr := fmt.Errorf("choosing to panic (may trigger restart) due to possible unrecoverable publishing error: %w", publishErr)
+		panic(panicErr)
+	}
+	return publishErr
 }
