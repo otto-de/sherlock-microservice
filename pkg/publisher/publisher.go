@@ -60,7 +60,7 @@ func NewPanicPublisher[EV any](er *errorreporting.Client, base Publisher[EV]) *P
 
 func (p *PanicPublisher[EV]) PublishWithNACKPanic(ctx context.Context, event *EV, opts ...Option) errorreports.Error {
 	publishErr := p.base.Publish(ctx, event, opts...)
-	if publishErr != nil {
+	if publishErr == nil {
 		return nil
 	}
 	span := trace.SpanFromContext(ctx)
