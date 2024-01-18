@@ -17,10 +17,16 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+type fakeServers struct {
+	PubSub *pstest.Server
+}
+type FakeSetup struct {
+	Servers  fakeServers
+	Services gcp.Services
+}
+
 type server struct {
-	gcp.Services
-	PubSub       *pubsub.Client
-	PubSubServer *pstest.Server
+	FakeSetup
 
 	listener     net.Listener
 	grpcServer   *grpc.Server
@@ -124,13 +130,17 @@ func MustMakeTestServices(ctx context.Context, project, serviceName string, opts
 	}()
 
 	return &server{
-		Services: gcp.Services{
-			ErrorReporting: errRep,
-			Logging:        lc,
-			TracerProvider: tp,
+		FakeSetup: FakeSetup{
+			Servers: fakeServers{
+				PubSub: psServer,
+			},
+			Services: gcp.Services{
+				TracerProvider: tp,
+				ErrorReporting: errRep,
+				Logging:        lc,
+				PubSub:         pubSub,
+			},
 		},
-		PubSub:       pubSub,
-		PubSubServer: psServer,
 		fes:          fes,
 		grpcServer:   grpcServer,
 		listener:     l,
@@ -141,10 +151,9 @@ func MustMakeTestServices(ctx context.Context, project, serviceName string, opts
 func (s *server) Close() error {
 	// Ignore close errors because usually
 	// we are not that particular about testing
-	s.PubSub.Close()
 	s.Services.Close()
 	s.grpcServer.GracefulStop()
-	s.PubSubServer.Close()
+	s.Servers.PubSub.Close()
 	s.psServerConn.Close()
 	s.listener.Close()
 	return nil

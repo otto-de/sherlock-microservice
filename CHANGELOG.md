@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.51 Allow passing of Test Clients
+- Introduces `FakeSetup`, which allows for passing TestClients along.
+
 ## v0.0.47 Fix accessing OrderingKey
 **Bugfixes**
 - Corrects implementation of function `ApplyCloudEventsPubSubOrderingKey`

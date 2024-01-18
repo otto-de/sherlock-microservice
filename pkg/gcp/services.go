@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/logging"
+	"cloud.google.com/go/pubsub"
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/otto-de/sherlock-microservice/pkg/gke"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -16,9 +17,11 @@ import (
 
 // Services contains all Google Cloud Services that
 // we use
+// TODO: Spit non-Services to another struct
 type Services struct {
 	Logging           *logging.Client
 	ErrorReporting    *errorreporting.Client
+	PubSub            *pubsub.Client
 	TracerProvider    *sdktrace.TracerProvider
 	MonitoredResource *monitoredres.MonitoredResource
 }
@@ -146,6 +149,7 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 // Does **not** handle errors in close since there usually
 // is not much that can be done on Close failure anyway.
 func (s *Services) Close() {
+	s.PubSub.Close()
 	s.TracerProvider.ForceFlush(context.Background()) // flushes any pending spans
 	s.ErrorReporting.Close()
 	s.Logging.Close()
