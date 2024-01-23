@@ -149,7 +149,9 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 // Does **not** handle errors in close since there usually
 // is not much that can be done on Close failure anyway.
 func (s *Services) Close() {
-	s.PubSub.Close()
+	if s.PubSub != nil {
+		s.PubSub.Close()
+	}
 	s.TracerProvider.ForceFlush(context.Background()) // flushes any pending spans
 	s.ErrorReporting.Close()
 	s.Logging.Close()
