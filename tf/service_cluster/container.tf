@@ -1,3 +1,7 @@
+locals {
+  location = "europe-west1"
+}
+
 resource "google_container_cluster" "main" {
   provider         = google-beta
   name             = var.name
@@ -13,7 +17,7 @@ resource "google_container_cluster" "main" {
     channel = var.release_channel_name
   }
 
-  location   = "europe-west1"
+  location   = local.location
   network    = var.network.name
   subnetwork = var.subnetwork.name
   ip_allocation_policy {
