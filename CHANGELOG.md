@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.55 Allow setting of Extensions
+- Introduces `ApplyCloudEventOptions` for applying Options to CloudEvents
+
 ## v0.0.51 Allow passing of Test Clients
 - Introduces `FakeSetup`, which allows for passing TestClients along.
 

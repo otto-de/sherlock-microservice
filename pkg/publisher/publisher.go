@@ -6,13 +6,21 @@ import (
 
 	"cloud.google.com/go/errorreporting"
 	cepubsub "github.com/cloudevents/sdk-go/protocol/pubsub/v2"
+	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/otto-de/sherlock-microservice/pkg/gcp/errorreports"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type Option struct {
+	extensions  map[string]any
 	orderingKey string
+}
+
+func WithExtensions(extensions map[string]any) Option {
+	return Option{
+		extensions: extensions,
+	}
 }
 
 func WithOrderingKey(orderingKey string) Option {
@@ -39,6 +47,18 @@ func ApplyCloudEventsPubSubOrderingKey(ctx context.Context, opts ...Option) cont
 	for _, opt := range opts {
 		if opt.orderingKey != "" {
 			ctx = cepubsub.WithOrderingKey(ctx, opt.orderingKey)
+		}
+	}
+	return ctx
+}
+
+func ApplyCloudEventOptions(ctx context.Context, event *event.Event, opts ...Option) context.Context {
+	ctx = ApplyCloudEventsPubSubOrderingKey(ctx, opts...)
+	for _, opt := range opts {
+		if opt.extensions != nil {
+			for k, v := range opt.extensions {
+				event.SetExtension(k, v)
+			}
 		}
 	}
 	return ctx

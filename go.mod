@@ -11,6 +11,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.21.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/propagator v0.45.0
 	github.com/cloudevents/sdk-go/protocol/pubsub/v2 v2.14.0
+	github.com/cloudevents/sdk-go/v2 v2.14.0
 	github.com/google/go-cmp v0.6.0
 	go.opentelemetry.io/otel v1.22.0
 	go.opentelemetry.io/otel/sdk v1.22.0
@@ -37,7 +38,6 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/chai2010/gettext-go v0.0.0-20160711120539-c6fed771bfd5 // indirect
-	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful v2.16.0+incompatible // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
