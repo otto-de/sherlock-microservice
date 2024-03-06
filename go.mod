@@ -11,7 +11,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.21.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/propagator v0.45.0
 	github.com/cloudevents/sdk-go/protocol/pubsub/v2 v2.15.0
-	github.com/cloudevents/sdk-go/v2 v2.15.0
+	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/google/go-cmp v0.6.0
 	go.opentelemetry.io/otel v1.22.0
 	go.opentelemetry.io/otel/sdk v1.22.0
