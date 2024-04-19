@@ -44,6 +44,14 @@ resource "google_container_cluster" "main" {
 
   deletion_protection = var.deletion_protection
 
+  protect_config {
+    workload_config {
+      audit_mode = "BASIC"
+    }
+    workload_vulnerability_mode = "BASIC"
+  }
+
+
   lifecycle {
     ignore_changes = [
       dns_config,
