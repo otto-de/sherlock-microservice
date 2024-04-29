@@ -47,6 +47,7 @@ type discoveryOption struct {
 	namespace               string
 	pod                     string
 	gkeAutoDiscoverMetaData bool
+	discoverPubSub          bool
 }
 
 func WithKubernetes(clusterName, namespace, pod, containerName string) discoveryOption {
@@ -55,6 +56,12 @@ func WithKubernetes(clusterName, namespace, pod, containerName string) discovery
 		namespace:     namespace,
 		pod:           pod,
 		containerName: containerName,
+	}
+}
+
+func WithPubSub() discoveryOption {
+	return discoveryOption{
+		discoverPubSub: true,
 	}
 }
 
@@ -118,6 +125,7 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 		ErrorReporting: errorClient,
 	}
 
+	discoverPubSub := false
 	var traceResource *resource.Resource
 	for _, opt := range opts {
 		if opt.gkeAutoDiscoverMetaData {
@@ -134,10 +142,18 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 			traceResource = gke.TraceResourceFromMetaData(serviceName, metadata)
 		} else if opt.pod != "" {
 			s.MonitoredResource = gke.MonitoredResource(s.Logging, project, opt.clusterName, opt.namespace, opt.pod, opt.containerName)
+		} else if opt.discoverPubSub {
+			discoverPubSub = true
 		}
 	}
 	if traceResource != nil {
 		tracerProviderOptions = append(tracerProviderOptions, sdktrace.WithResource(traceResource))
+	}
+	if discoverPubSub {
+		s.PubSub, err = pubsub.NewClient(context.Background(), project)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	s.TracerProvider = sdktrace.NewTracerProvider(append(tracerProviderOptions, sdktrace.WithBatcher(exporter))...)
