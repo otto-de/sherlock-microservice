@@ -48,6 +48,7 @@ type discoveryOption struct {
 	pod                     string
 	gkeAutoDiscoverMetaData bool
 	discoverPubSub          bool
+	traceExporterOption     texporter.Option
 }
 
 func WithKubernetes(clusterName, namespace, pod, containerName string) discoveryOption {
@@ -91,6 +92,12 @@ func WithGKEAutoDiscoverMetaData() discoveryOption {
 	}
 }
 
+func WithTraceExporterOption(to texporter.Option) discoveryOption {
+	return discoveryOption{
+		traceExporterOption: to,
+	}
+}
+
 // DiscoverServices builds clients for all Services that we use.
 func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption, opts ...discoveryOption) (*Services, error) {
 	loggingClient, err := NewLoggingClient(project)
@@ -115,7 +122,14 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 		panic(err)
 	}
 
-	exporter, err := texporter.New(texporter.WithProjectID(project))
+	traceExporterOptions := []texporter.Option{texporter.WithProjectID(project)}
+	for _, opt := range opts {
+		if opt.traceExporterOption != nil {
+			traceExporterOptions = append(traceExporterOptions, opt.traceExporterOption)
+		}
+	}
+
+	exporter, err := texporter.New(traceExporterOptions...)
 	if err != nil {
 		panic(err)
 	}

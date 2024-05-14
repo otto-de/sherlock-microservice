@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.60 Allow TraceExporterOption
+- Enable passing options to `DiscoverServices` via `WithTraceExporterOption`
+
 ## v0.0.55 Allow setting of Extensions
 - Introduces `ApplyCloudEventOptions` for applying Options to CloudEvents
 
