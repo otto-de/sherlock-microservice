@@ -23,9 +23,14 @@ resource "google_container_cluster" "main" {
   ip_allocation_policy {
   }
 
-  node_pool_auto_config {
-    network_tags {
-      tags = var.add_node_pool_network_tags
+  dynamic "node_pool_auto_config" {
+    # terraform would detect false changes if the add_node_pool_network_tags is empty
+    # this will prevent this behavior
+    for_each = length(var.add_node_pool_network_tags) == 0 ? [] : [1]
+    content {
+      network_tags {
+        tags = var.add_node_pool_network_tags
+      }
     }
   }
 
