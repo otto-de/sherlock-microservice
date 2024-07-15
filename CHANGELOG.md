@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.61 Switch GKE Pods to execute on TB
+- Interacting with GKE Pod functions new needs testing.TB object.
+
 ## v0.0.60 Allow TraceExporterOption
 - Enable passing options to `DiscoverServices` via `WithTraceExporterOption`
 
