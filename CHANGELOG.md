@@ -1,6 +1,8 @@
 # Changelog
 
-## v0.0.61 Switch GKE Pods to execute on TB
+## v0.0.63 Enforce Docker file paths to building Containers
+
+## v0.0.62 Switch GKE Pods to execute on TB
 - Interacting with GKE Pod functions new needs testing.TB object.
 
 ## v0.0.60 Allow TraceExporterOption
