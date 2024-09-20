@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.64 Implement Benthos processor aws_sns_message_verify
+- Allow for verifying SNS Webhook data
+
 ## v0.0.63 Enforce Docker file paths to building Containers
 
 ## v0.0.62 Switch GKE Pods to execute on TB
