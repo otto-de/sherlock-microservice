@@ -1,6 +1,7 @@
 package gke
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"strings"
@@ -56,8 +57,8 @@ func parseInstanceJSON(jsonData []byte) (*instance, error) {
 	return &instance, nil
 }
 
-func GetMetaData() (*GKEMetaData, error) {
-	s, err := metadata.Get("/?recursive=true")
+func GetMetaData(ctx context.Context) (*GKEMetaData, error) {
+	s, err := metadata.GetWithContext(ctx, "/?recursive=true")
 	if err != nil {
 		return &GKEMetaData{}, err
 	}

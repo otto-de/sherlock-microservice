@@ -139,11 +139,13 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 		ErrorReporting: errorClient,
 	}
 
+	ctx := context.Background()
+
 	discoverPubSub := false
 	var traceResource *resource.Resource
 	for _, opt := range opts {
 		if opt.gkeAutoDiscoverMetaData {
-			metadata, err := gke.GetMetaData()
+			metadata, err := gke.GetMetaData(ctx)
 			if err != nil {
 				logger.Log(logging.Entry{
 					Severity: logging.Info,
@@ -164,7 +166,7 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 		tracerProviderOptions = append(tracerProviderOptions, sdktrace.WithResource(traceResource))
 	}
 	if discoverPubSub {
-		s.PubSub, err = pubsub.NewClient(context.Background(), project)
+		s.PubSub, err = pubsub.NewClient(ctx, project)
 		if err != nil {
 			return nil, err
 		}
