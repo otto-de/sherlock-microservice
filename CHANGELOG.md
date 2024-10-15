@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.65 Change pod log streaming
+- respect the connection settings of the clientset
+
 ## v0.0.64 Implement Benthos processor aws_sns_message_verify
 - Allow for verifying SNS Webhook data
 
