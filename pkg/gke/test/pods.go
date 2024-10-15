@@ -26,7 +26,6 @@ type PodRun struct {
 // NewPodRun is starting a remote Pod and streams its output locally.
 // Output gets written using provided streams.
 func NewPodRunWithStreams(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Context, pod *core.Pod, streams genericclioptions.IOStreams) *PodRun {
-
 	pods := clientset.CoreV1().Pods(pod.Namespace)
 
 	tb.Log("Creating Test Pod\n")
@@ -46,7 +45,7 @@ func NewPodRunWithStreams(tb testing.TB, clientset *kubernetes.Clientset, ctx co
 	go func() {
 		defer pr.logStreaming.Done()
 
-		err := gke.StreamContainerLog(pod.Namespace, pod, "test", streams)
+		err := gke.StreamContainerLog(ctx, pods, pod, "test", streams)
 		if err != nil {
 			panic(err)
 		}
