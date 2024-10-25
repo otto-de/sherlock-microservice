@@ -62,8 +62,8 @@ func ctor(conf *service.ParsedConfig, mgr *service.Resources) (service.Processor
 		return nil, err
 	}
 
-	if !mgr.HasCache(cacheName) {
-		return nil, fmt.Errorf("cache named %v not found", cacheName)
+	if cacheName != "" && !mgr.HasCache(cacheName) {
+		return nil, fmt.Errorf("cache named %s not found", cacheName)
 	}
 
 	return &processor{
