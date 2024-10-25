@@ -64,7 +64,7 @@ func MonitoredResourceFromMetaData(metadata *GKEMetaData) *monitoredres.Monitore
 			"project_id":     metadata.ProjectID,
 			"cluster_name":   metadata.ClusterName,
 			"namespace_id":   metadata.Namespace,
-			"instance_id":    string(metadata.InstanceID),
+			"instance_id":    fmt.Sprint(metadata.InstanceID),
 			"pod_id":         metadata.PodName,
 			"container_name": metadata.ContainerName,
 			"zone":           metadata.Zone,
