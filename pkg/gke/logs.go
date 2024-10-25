@@ -11,8 +11,6 @@ import (
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
-var defaultConfigFlags = genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag().WithDiscoveryBurst(300).WithDiscoveryQPS(50.0)
-
 // StreamContainerLog streams log for that one container to Stdout and Stderr.
 func StreamContainerLog(ctx context.Context, pods v1.PodInterface, pod *core.Pod, containerName string, streams genericclioptions.IOStreams) error {
 	// wait for pod to be running or terminated
