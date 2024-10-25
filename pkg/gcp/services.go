@@ -157,7 +157,7 @@ func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktr
 			s.MonitoredResource = gke.MonitoredResourceFromMetaData(metadata)
 			traceResource = gke.TraceResourceFromMetaData(serviceName, metadata)
 		} else if opt.pod != "" {
-			s.MonitoredResource = gke.MonitoredResource(s.Logging, project, opt.clusterName, opt.namespace, opt.pod, opt.containerName)
+			s.MonitoredResource = gke.MonitoredResource(ctx, s.Logging, project, opt.clusterName, opt.namespace, opt.pod, opt.containerName)
 		} else if opt.discoverPubSub {
 			discoverPubSub = true
 		}

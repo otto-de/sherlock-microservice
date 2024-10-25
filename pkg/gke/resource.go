@@ -1,6 +1,7 @@
 package gke
 
 import (
+	"context"
 	"fmt"
 
 	"cloud.google.com/go/compute/metadata"
@@ -11,7 +12,7 @@ import (
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 )
 
-func MonitoredResource(l *logging.Client, project, clusterName, namespace, pod, containerName string) *monitoredres.MonitoredResource {
+func MonitoredResource(ctx context.Context, l *logging.Client, project, clusterName, namespace, pod, containerName string) *monitoredres.MonitoredResource {
 	instanceId := "unknown"
 	zone := "unknown"
 	res := &monitoredres.MonitoredResource{
@@ -32,7 +33,7 @@ func MonitoredResource(l *logging.Client, project, clusterName, namespace, pod, 
 
 	// Refine labels
 	var err error
-	instanceId, err = metadata.InstanceID()
+	instanceId, err = metadata.InstanceIDWithContext(ctx)
 	if instanceId == "" {
 		logger.Log(logging.Entry{
 			Severity: logging.Info,
@@ -43,7 +44,7 @@ func MonitoredResource(l *logging.Client, project, clusterName, namespace, pod, 
 		res.Labels["instance_id"] = instanceId
 	}
 
-	zone, err = metadata.Zone()
+	zone, err = metadata.ZoneWithContext(ctx)
 	if zone == "" {
 		logger.Log(logging.Entry{
 			Severity: logging.Info,
