@@ -169,9 +169,14 @@ func (p *processor) downloadCached(ctx context.Context, url string) ([]byte, err
 		return body, nil
 	}
 
-	resp, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("building request failed: %w", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("get request to %s failed: %w", url, err)
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
