@@ -1,5 +1,7 @@
 # Changelog
 
+## v0.0.66 Allow for caching in aws_sns_message_verify
+
 ## v0.0.65 Change pod log streaming
 - respect the connection settings of the clientset
 
