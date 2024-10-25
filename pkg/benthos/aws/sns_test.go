@@ -1,6 +1,10 @@
 package aws
 
 import (
+	"context"
+	"fmt"
+	"io"
+	"net/http"
 	"regexp"
 	"testing"
 )
@@ -20,14 +24,31 @@ func TestVerifyPayload(t *testing.T) {
 		"Type":             "SubscriptionConfirmation",
 	}
 
+	ctx := context.Background()
+
 	vp := snsPayloadVerifier{
 		hostPattern: regexp.MustCompile(".*"),
 	}
 	err := vp.verifyFromURL(
+		ctx,
 		m,
 		"NYKFYRGHtyHcgBiB1DZPBkwt0RcP3bbBKYIC7bMkpIsY33o45UH1ijgrx0CeORs+arakrFL+jSKYpLtZAkiwKDVnPJ4Czywx8bTz0V1z1dwMaLfYYjUbqOrRiPxVMUeIbjGUATJwgyH8IiADj04v5OnbNpEA4nIPlELANSlf8SOkxSBx9mNmA3HThgDXpoZTDup1J9wEgdtXZQ5xrrWBuYRxeDrheYOxZzokrc7TK1RSWhy3svPYXwY2vvq0mfbDeoDe9UWLO8/0GDOZscXQ+Irds1E6yvrWoLCJ/2ktruFEtPrQvLvg/mrbDMtuNNC1tOe8Xc22gA3juvEwrSOLoQ==",
 		"https://raw.githubusercontent.com/otto-de/sherlock-microservice/main/pkg/aws/testdata/SimpleNotificationService-60eadc530605d63b8e62a523676ef735.pem",
 		"1",
+		func(ctx context.Context, url string) ([]byte, error) {
+			resp, err := http.Get(url)
+			if err != nil {
+				return nil, err
+			}
+
+			if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+				return nil, fmt.Errorf("cert request failed with status: %s", resp.Status)
+			}
+
+			defer resp.Body.Close()
+
+			return io.ReadAll(resp.Body)
+		},
 	)
 	if err != nil {
 		t.Fatal("Expected no error, got:", err)

@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"time"
 
 	_ "github.com/redpanda-data/benthos/v4/public/components/pure"
 
@@ -35,6 +36,9 @@ Verifies a message sent by AWS SNS. This processor implements https://docs.aws.a
 				Advanced().
 				Description("field allows for overriding the host check. Intended for testing purposes only.").
 				Default(awsHostPattern),
+			service.NewStringField("cache").
+				Description("The cache to use for storing certificates. If empty, no cache is used.").
+				Default(""),
 		)
 	err := service.RegisterProcessor("aws_sns_message_verify", spec, ctor)
 	if err != nil {
@@ -53,13 +57,26 @@ func ctor(conf *service.ParsedConfig, mgr *service.Resources) (service.Processor
 		hostPattern = awsHostPattern
 	}
 
+	cacheName, err := conf.FieldString("cache")
+	if err != nil {
+		return nil, err
+	}
+
+	if !mgr.HasCache(cacheName) {
+		return nil, fmt.Errorf("cache named %v not found", cacheName)
+	}
+
 	return &processor{
+		cache:       cacheName,
+		mgr:         mgr,
 		hostPattern: regexp.MustCompile(hostPattern),
 	}, nil
 }
 
 type processor struct {
+	cache       string
 	hostPattern *regexp.Regexp
+	mgr         *service.Resources
 }
 
 func (p *processor) Process(ctx context.Context, message *service.Message) (service.MessageBatch, error) {
@@ -125,7 +142,7 @@ func (p *processor) Process(ctx context.Context, message *service.Message) (serv
 	vp := snsPayloadVerifier{
 		hostPattern: p.hostPattern,
 	}
-	err = vp.verifyFromURL(root, signatureBase64, signingCertURL, signatureVersion)
+	err = vp.verifyFromURL(ctx, root, signatureBase64, signingCertURL, signatureVersion, p.downloadCached)
 	if err != nil {
 		return nil, fmt.Errorf("signature verification failed: %w", err)
 	}
@@ -137,6 +154,43 @@ func (p *processor) Process(ctx context.Context, message *service.Message) (serv
 
 func (p *processor) Close(ctx context.Context) error {
 	return nil
+}
+
+func (p *processor) downloadCached(ctx context.Context, url string) ([]byte, error) {
+	var err error
+	var body []byte
+	if p.cache != "" {
+		p.mgr.AccessCache(ctx, p.cache, func(c service.Cache) {
+			body, err = c.Get(ctx, url)
+		})
+	}
+
+	if len(body) > 0 {
+		return body, nil
+	}
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("cert request failed with status: %s", resp.Status)
+	}
+
+	defer resp.Body.Close()
+
+	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if p.cache != "" {
+		err = p.mgr.AccessCache(ctx, p.cache, func(c service.Cache) {
+			ttl := time.Hour
+			c.Set(ctx, url, body, &ttl)
+		})
+	}
+	return body, err
 }
 
 const awsHostPattern = `^sns\.[a-zA-Z0-9\-]{3,}\.amazonaws\.com(\.cn)?$`
@@ -174,7 +228,7 @@ type snsPayloadVerifier struct {
 }
 
 // verifyFromURL will verify that a payload came from SNS
-func (vp *snsPayloadVerifier) verifyFromURL(root map[string]any, signatureBase64 string, signingCertURL string, signatureVersion string) error {
+func (vp *snsPayloadVerifier) verifyFromURL(ctx context.Context, root map[string]any, signatureBase64, signingCertURL, signatureVersion string, get func(ctx context.Context, url string) ([]byte, error)) error {
 
 	scheme := "https"
 	if vp.scheme != "" {
@@ -199,18 +253,7 @@ func (vp *snsPayloadVerifier) verifyFromURL(root map[string]any, signatureBase64
 		return fmt.Errorf("certificate is located on an invalid domain")
 	}
 
-	resp, err := http.Get(signingCertURL)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("cert request failed with status: %s", resp.Status)
-	}
-
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
+	body, err := get(ctx, signingCertURL)
 	if err != nil {
 		return err
 	}
