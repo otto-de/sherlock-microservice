@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"sync"
 	"testing"
@@ -66,18 +67,25 @@ func NewPodRun(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Conte
 }
 
 // Close waits until there is no more output to stream. Then deletes the Pod.
-func (pr *PodRun) Close(tb testing.TB) error {
+func (pr *PodRun) Close(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Context) error {
 	pr.logStreaming.Wait()
 
-	switch pr.Pod.Status.Phase {
+	pods := clientset.CoreV1().Pods(pr.Pod.Namespace)
+
+	pod, err := pods.Get(ctx, pr.Pod.Name, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to get Pod '%s': %w", pr.Pod.Name, err)
+	}
+
+	switch pod.Status.Phase {
 	case core.PodFailed:
-		tb.Logf("Pod '%s' failed. Keeping failed Test Pod for debugging\n", pr.Pod.Name)
+		tb.Logf("Pod '%s' failed. Keeping failed Test Pod for debugging\n", pod.Name)
 		return nil
 	case core.PodSucceeded:
-		tb.Logf("Pod '%s' succeeded. Deleting Test Pod\n", pr.Pod.Name)
-		return pr.pods.Delete(pr.ctx, pr.Pod.Name, metav1.DeleteOptions{})
+		tb.Logf("Pod '%s' succeeded. Deleting Test Pod\n", pod.Name)
+		return pods.Delete(ctx, pod.Name, metav1.DeleteOptions{})
 	default:
-		tb.Logf("Pod '%s' in state '%v'. Keeping Test Pod for possible debugging\n", pr.Pod.Name, pr.Pod.Status.Phase)
+		tb.Logf("Pod '%s' in state '%v'. Keeping Test Pod for possible debugging\n", pod.Name, pod.Status.Phase)
 		return nil
 	}
 }
