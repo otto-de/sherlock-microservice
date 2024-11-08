@@ -2,11 +2,9 @@ package test
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/otto-de/sherlock-microservice/pkg/gke"
 	core "k8s.io/api/core/v1"
@@ -67,31 +65,14 @@ func NewPodRun(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Conte
 	return NewPodRunWithStreams(tb, clientset, ctx, pod, streams)
 }
 
-// Close waits until there is no more output to stream. Then deletes the Pod.
-func (pr *PodRun) Close(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Context) error {
-	pr.logStreaming.Wait()
-
+func (pr *PodRun) DeletePod(clientset *kubernetes.Clientset, ctx context.Context) error {
 	pods := clientset.CoreV1().Pods(pr.Pod.Namespace)
 
-	for {
-		pod, err := pods.Get(ctx, pr.Pod.Name, metav1.GetOptions{})
-		if err != nil {
-			return fmt.Errorf("failed to get Pod '%s': %w", pr.Pod.Name, err)
-		}
+	return pods.Delete(ctx, pr.Pod.Name, metav1.DeleteOptions{})
+}
 
-		switch pod.Status.Phase {
-		case core.PodFailed:
-			tb.Logf("Pod '%s' failed. Keeping failed Test Pod for debugging\n", pod.Name)
-			return nil
-		case core.PodSucceeded:
-			tb.Logf("Pod '%s' succeeded. Deleting Test Pod\n", pod.Name)
-			return pods.Delete(ctx, pod.Name, metav1.DeleteOptions{})
-		case core.PodPending:
-		case core.PodRunning:
-		default:
-			tb.Logf("Pod '%s' in state '%v'. Keeping Test Pod for possible debugging\n", pod.Name, pod.Status.Phase)
-			return nil
-		}
-		time.Sleep(time.Second)
-	}
+// Close waits until there is no more output to stream.
+func (pr *PodRun) Close() error {
+	pr.logStreaming.Wait()
+	return nil
 }
