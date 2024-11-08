@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/otto-de/sherlock-microservice/pkg/gke"
 	core "k8s.io/api/core/v1"
@@ -72,20 +73,25 @@ func (pr *PodRun) Close(tb testing.TB, clientset *kubernetes.Clientset, ctx cont
 
 	pods := clientset.CoreV1().Pods(pr.Pod.Namespace)
 
-	pod, err := pods.Get(ctx, pr.Pod.Name, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to get Pod '%s': %w", pr.Pod.Name, err)
-	}
+	for {
+		pod, err := pods.Get(ctx, pr.Pod.Name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to get Pod '%s': %w", pr.Pod.Name, err)
+		}
 
-	switch pod.Status.Phase {
-	case core.PodFailed:
-		tb.Logf("Pod '%s' failed. Keeping failed Test Pod for debugging\n", pod.Name)
-		return nil
-	case core.PodSucceeded:
-		tb.Logf("Pod '%s' succeeded. Deleting Test Pod\n", pod.Name)
-		return pods.Delete(ctx, pod.Name, metav1.DeleteOptions{})
-	default:
-		tb.Logf("Pod '%s' in state '%v'. Keeping Test Pod for possible debugging\n", pod.Name, pod.Status.Phase)
-		return nil
+		switch pod.Status.Phase {
+		case core.PodFailed:
+			tb.Logf("Pod '%s' failed. Keeping failed Test Pod for debugging\n", pod.Name)
+			return nil
+		case core.PodSucceeded:
+			tb.Logf("Pod '%s' succeeded. Deleting Test Pod\n", pod.Name)
+			return pods.Delete(ctx, pod.Name, metav1.DeleteOptions{})
+		case core.PodPending:
+		case core.PodRunning:
+		default:
+			tb.Logf("Pod '%s' in state '%v'. Keeping Test Pod for possible debugging\n", pod.Name, pod.Status.Phase)
+			return nil
+		}
+		time.Sleep(time.Second)
 	}
 }
