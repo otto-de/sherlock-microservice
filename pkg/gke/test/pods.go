@@ -68,6 +68,16 @@ func NewPodRun(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Conte
 // Close waits until there is no more output to stream. Then deletes the Pod.
 func (pr *PodRun) Close(tb testing.TB) error {
 	pr.logStreaming.Wait()
-	tb.Logf("Deleting Test Pod `%s`\n", pr.Pod.Name)
-	return pr.pods.Delete(pr.ctx, pr.Pod.Name, metav1.DeleteOptions{})
+
+	switch pr.Pod.Status.Phase {
+	case core.PodFailed:
+		tb.Logf("Pod '%s' failed. Keeping failed Test Pod for debugging\n", pr.Pod.Name)
+		return nil
+	case core.PodSucceeded:
+		tb.Logf("Pod '%s' succeeded. Deleting Test Pod\n", pr.Pod.Name)
+		return pr.pods.Delete(pr.ctx, pr.Pod.Name, metav1.DeleteOptions{})
+	default:
+		tb.Logf("Pod '%s' in state '%v'. Keeping Test Pod for possible debugging\n", pr.Pod.Name, pr.Pod.Status.Phase)
+		return nil
+	}
 }
