@@ -66,13 +66,15 @@ func NewPodRun(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Conte
 }
 
 func (pr *PodRun) DeletePod(clientset *kubernetes.Clientset, ctx context.Context) error {
-	pods := clientset.CoreV1().Pods(pr.Pod.Namespace)
+	pr.logStreaming.Wait()
 
+	pods := clientset.CoreV1().Pods(pr.Pod.Namespace)
 	return pods.Delete(ctx, pr.Pod.Name, metav1.DeleteOptions{})
 }
 
 // Close waits until there is no more output to stream.
 func (pr *PodRun) Close() error {
 	pr.logStreaming.Wait()
+
 	return nil
 }
