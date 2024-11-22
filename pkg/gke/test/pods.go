@@ -9,23 +9,18 @@ import (
 	"github.com/otto-de/sherlock-microservice/pkg/gke"
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"k8s.io/client-go/kubernetes"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
-// PodRun is an test execution run of a Pod.
-type PodRun struct {
-	ctx          context.Context
-	logStreaming sync.WaitGroup
+type CreatedPod struct {
 	pods         v1.PodInterface
-	Pod          *core.Pod
-	streams      genericclioptions.IOStreams
+	pod          *core.Pod
+	logStreaming sync.WaitGroup
 }
 
-// NewPodRun is starting a remote Pod and streams its output locally.
-// Output gets written using provided streams.
-func NewPodRunWithStreams(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Context, pod *core.Pod, streams genericclioptions.IOStreams) *PodRun {
+func MustCreatePod(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Context, pod *core.Pod) *CreatedPod {
 	pods := clientset.CoreV1().Pods(pod.Namespace)
 
 	tb.Log("Creating Test Pod\n")
@@ -35,17 +30,39 @@ func NewPodRunWithStreams(tb testing.TB, clientset *kubernetes.Clientset, ctx co
 	}
 	tb.Logf("Created Test Pod `%s`\n", pod.Name)
 
+	return &CreatedPod{
+		pods: pods,
+		pod:  pod,
+	}
+}
+
+func (cp *CreatedPod) Delete() error {
+	cp.logStreaming.Wait()
+
+	return cp.pods.Delete(context.TODO(), cp.pod.Name, metav1.DeleteOptions{})
+}
+
+// PodRun is an test execution run of a Pod.
+type PodRun struct {
+	ctx     context.Context
+	Pod     *CreatedPod
+	streams genericiooptions.IOStreams
+}
+
+// RunWithStreams streams a Pod output locally.
+// Output gets written using provided streams.
+func (cp *CreatedPod) RunWithStreams(tb testing.TB, ctx context.Context, streams genericiooptions.IOStreams) *PodRun {
+
 	pr := &PodRun{
 		ctx:     ctx,
-		pods:    pods,
-		Pod:     pod,
+		Pod:     cp,
 		streams: streams,
 	}
-	pr.logStreaming.Add(1)
+	cp.logStreaming.Add(1)
 	go func() {
-		defer pr.logStreaming.Done()
+		defer cp.logStreaming.Done()
 
-		err := gke.StreamContainerLog(ctx, pods, pod, "test", streams)
+		err := gke.StreamContainerLog(ctx, cp.pods, cp.pod, "test", streams)
 		if err != nil {
 			panic(err)
 		}
@@ -53,28 +70,21 @@ func NewPodRunWithStreams(tb testing.TB, clientset *kubernetes.Clientset, ctx co
 	return pr
 }
 
-// NewPodRun is starting a remote Pod and streams its output locally.
+// Run streams a Pod output locally.
 // Output gets written to Stdout and Stderr.
-func NewPodRun(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Context, pod *core.Pod) *PodRun {
+func (cp *CreatedPod) Run(tb testing.TB, clientset *kubernetes.Clientset, ctx context.Context) *PodRun {
 
-	streams := genericclioptions.IOStreams{
+	streams := genericiooptions.IOStreams{
 		In:     nil,
 		Out:    os.Stdout,
 		ErrOut: os.Stderr,
 	}
-	return NewPodRunWithStreams(tb, clientset, ctx, pod, streams)
-}
-
-func (pr *PodRun) DeletePod(clientset *kubernetes.Clientset, ctx context.Context) error {
-	pr.logStreaming.Wait()
-
-	pods := clientset.CoreV1().Pods(pr.Pod.Namespace)
-	return pods.Delete(ctx, pr.Pod.Name, metav1.DeleteOptions{})
+	return cp.RunWithStreams(tb, ctx, streams)
 }
 
 // Close waits until there is no more output to stream.
 func (pr *PodRun) Close() error {
-	pr.logStreaming.Wait()
+	pr.Pod.logStreaming.Wait()
 
 	return nil
 }
