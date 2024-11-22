@@ -16,7 +16,7 @@ import (
 
 type CreatedPod struct {
 	pods         v1.PodInterface
-	pod          *core.Pod
+	Pod          *core.Pod
 	logStreaming sync.WaitGroup
 }
 
@@ -32,14 +32,14 @@ func MustCreatePod(tb testing.TB, clientset *kubernetes.Clientset, ctx context.C
 
 	return &CreatedPod{
 		pods: pods,
-		pod:  pod,
+		Pod:  pod,
 	}
 }
 
 func (cp *CreatedPod) Delete() error {
 	cp.logStreaming.Wait()
 
-	return cp.pods.Delete(context.TODO(), cp.pod.Name, metav1.DeleteOptions{})
+	return cp.pods.Delete(context.TODO(), cp.Pod.Name, metav1.DeleteOptions{})
 }
 
 // PodRun is an test execution run of a Pod.
@@ -62,7 +62,7 @@ func (cp *CreatedPod) RunWithStreams(tb testing.TB, ctx context.Context, streams
 	go func() {
 		defer cp.logStreaming.Done()
 
-		err := gke.StreamContainerLog(ctx, cp.pods, cp.pod, "test", streams)
+		err := gke.StreamContainerLog(ctx, cp.pods, cp.Pod, "test", streams)
 		if err != nil {
 			panic(err)
 		}
