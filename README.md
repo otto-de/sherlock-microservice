@@ -2,6 +2,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/otto-de/sherlock-microservice)](https://goreportcard.com/report/github.com/otto-de/sherlock-microservice)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/otto-de/sherlock-microservice)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/otto-de/sherlock-microservice)
+![OSS Lifecycle](https://img.shields.io/osslifecycle?file_url=https%3A%2F%2Fgithub.com%2Fotto-de%2Fsherlock-microservice%2Fblob%2Fmain%2FOSSMETADATA)
+
 
 # Microservice module for Sherlock
 
