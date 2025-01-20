@@ -31,6 +31,7 @@ resource "google_storage_bucket" "main" {
   location = var.location
 
   force_destroy               = var.force_destroy
+  public_access_prevention    = "enforced"
   uniform_bucket_level_access = true
 
   dynamic "retention_policy" {
