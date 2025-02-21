@@ -26,6 +26,15 @@ Supported values include: `SYSTEM_COMPONENTS`, `APISERVER`, `SCHEDULER`, `CONTRO
 EOF
 }
 
+variable "ip_allocation_policy" {
+  description = "Configuration of cluster IP allocation for VPC-native clusters."
+  type = object({
+    stack_type = string
+  })
+  default = null
+  nullable = true
+}
+
 variable "master_cidr_block" {
   type = string
 }
@@ -41,6 +50,16 @@ variable "network" {
   })
 }
 
+variable "private_ipv6_google_access" {
+  description = <<EOF
+The desired state of IPv6 connectivity to Google Services.
+By default, no private IPv6 access to or from Google Services (all access will be via IPv4).
+EOF
+  type    = string
+  nullable = true
+  default = null
+}
+
 variable "release_channel_name" {
   type    = string
   default = "STABLE"
@@ -51,4 +70,3 @@ variable "subnetwork" {
     name = string
   })
 }
-

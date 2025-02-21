@@ -20,9 +20,10 @@ resource "google_container_cluster" "main" {
   location   = local.location
   network    = var.network.name
   subnetwork = var.subnetwork.name
-  ip_allocation_policy {
-  }
 
+  ip_allocation_policy {
+    stack_type = var.ip_allocation_policy == null ? null : var.ip_allocation_policy.stack_type
+  }
   dynamic "node_pool_auto_config" {
     # terraform would detect false changes if the add_node_pool_network_tags is empty
     # this will prevent this behavior
@@ -56,6 +57,7 @@ resource "google_container_cluster" "main" {
     workload_vulnerability_mode = "BASIC"
   }
 
+  private_ipv6_google_access = var.private_ipv6_google_access
 
   lifecycle {
     ignore_changes = [
