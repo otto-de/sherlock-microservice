@@ -60,7 +60,7 @@ resource "google_container_cluster" "main" {
   private_ipv6_google_access = var.private_ipv6_google_access
 
   # Seems like backend enforces subsetting on dual stack
-  enable_l4_ilb_subsetting = var.ip_allocation_policy == "IPV4_IPV6"
+  enable_l4_ilb_subsetting = var.ip_allocation_policy == null ? false : var.ip_allocation_policy.stack_type == "IPV4_IPV6"
 
   lifecycle {
     ignore_changes = [
