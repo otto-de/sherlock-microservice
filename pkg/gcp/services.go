@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
 
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/logging"
@@ -98,8 +99,34 @@ func WithTraceExporterOption(to texporter.Option) discoveryOption {
 	}
 }
 
-// DiscoverServices builds clients for all Services that we use.
-func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption, opts ...discoveryOption) (*Services, error) {
+// DiscoverServicesOnce returns a function that guarantees that service discovery only happens once -
+// even in concurrent usage.
+func DiscoverServicesOnce(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption, opts ...discoveryOption) func() (*Services, error) {
+	return sync.OnceValues(func() (*Services, error) {
+		return discoverServices(project, serviceName, tracerProviderOptions, opts...)
+	})
+}
+
+type DiscoverServicesResult struct {
+	Services *Services
+	Error    error
+}
+
+// DiscoverServices starts service discovery asynchronously.
+// Once it is done, it returns the discovery result in a channel.
+func DiscoverServices(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption, opts ...discoveryOption) chan DiscoverServicesResult {
+	resultChan := make(chan DiscoverServicesResult, 1)
+	go func() {
+		defer close(resultChan)
+
+		s, err := DiscoverServicesOnce(project, serviceName, tracerProviderOptions, opts...)()
+		resultChan <- DiscoverServicesResult{Services: s, Error: err}
+	}()
+	return resultChan
+}
+
+// discoverServices builds clients for all Services that we use.
+func discoverServices(project, serviceName string, tracerProviderOptions []sdktrace.TracerProviderOption, opts ...discoveryOption) (*Services, error) {
 	loggingClient, err := NewLoggingClient(project)
 	if err != nil {
 		return nil, err

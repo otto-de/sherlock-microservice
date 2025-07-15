@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.80 Change DiscoverServices behavior
+It was discovered that the runtime of service discovery is very lengthy in some scenarios.
+As such now change the API so that the API users are forced to handle this - in an hopefully better way.
+- DiscoverServices changed so that it starts discovery immediately but returns the result via channel
+- DiscoverServicesOnce allows calling discovery concurrently
+
 ## v0.0.66 Allow for caching in aws_sns_message_verify
 
 ## v0.0.65 Change pod log streaming
