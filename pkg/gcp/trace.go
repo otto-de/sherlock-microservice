@@ -6,12 +6,16 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-func MustInitTracerProvider(project string, opts ...sdktrace.TracerProviderOption) *sdktrace.TracerProvider {
+func newTraceProviderWithProjectExporter(project string, opts ...sdktrace.TracerProviderOption) *sdktrace.TracerProvider {
 	exporter, err := texporter.New(texporter.WithProjectID(project))
 	if err != nil {
 		panic(err)
 	}
-	tp := sdktrace.NewTracerProvider(append(opts, sdktrace.WithBatcher(exporter))...)
+	return sdktrace.NewTracerProvider(append(opts, sdktrace.WithBatcher(exporter))...)
+}
+
+func MustInitTracerProvider(project string, opts ...sdktrace.TracerProviderOption) *sdktrace.TracerProvider {
+	tp := newTraceProviderWithProjectExporter(project, opts...)
 	otel.SetTracerProvider(tp)
 	return tp
 }
