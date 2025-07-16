@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.82 Export NewTraceProviderWithProjectExporter
+- use NewTraceProviderWithProjectExporter without forcing global trace provider
+
 ## v0.0.80 Change DiscoverServices behavior
 It was discovered that the runtime of service discovery is very lengthy in some scenarios.
 As such now change the API so that the API users are forced to handle this - in an hopefully better way.
