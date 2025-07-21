@@ -34,6 +34,10 @@ resource "google_storage_bucket" "main" {
   public_access_prevention    = "enforced"
   uniform_bucket_level_access = true
 
+  versioning {
+    enabled = var.versioning_enabled
+  }
+
   dynamic "retention_policy" {
     for_each = var.retention_policy == null ? [] : [var.retention_policy]
     content {

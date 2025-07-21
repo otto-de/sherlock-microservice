@@ -1,5 +1,7 @@
 # Changelog
 
+## v0.0.84 Allow versioning of Cloud Buckets
+
 ## v0.0.83 Expose url of Cloud Bucket
 
 ## v0.0.82 Export NewTraceProviderWithProjectExporter

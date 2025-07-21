@@ -41,3 +41,9 @@ variable "retention_policy" {
   default     = null
   description = "Configuration of the bucket's data retention policy for how long objects in the bucket should be retained."
 }
+
+variable "versioning_enabled" {
+  description = "While set to true, versioning is fully enabled for this bucket."
+  type        = bool
+  default     = false
+}
