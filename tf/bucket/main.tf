@@ -7,7 +7,7 @@ data "google_project_iam_custom_role" "snowflake_bucket_access" {
     "storage.objects.create"
   ]
   role_id = "snowflake_bucket_access"
-  title   = "Team Marple - Snowflake Integration"
+  title   = "Snowflake Integration"
 }
 
 data "google_iam_policy" "main_bucket" {
