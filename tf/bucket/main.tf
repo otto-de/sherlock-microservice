@@ -1,3 +1,15 @@
+data "google_project_iam_custom_role" "snowflake_bucket_access" {
+  permissions = [
+    "storage.buckets.get",
+    "storage.objects.delete",
+    "storage.objects.get",
+    "storage.objects.list",
+    "storage.objects.create"
+  ]
+  role_id = "snowflake_bucket_access"
+  title   = "Team Marple - Snowflake Integration"
+}
+
 data "google_iam_policy" "main_bucket" {
   dynamic "binding" {
     for_each = var.admins == [] ? [] : [var.admins]
@@ -6,11 +18,19 @@ data "google_iam_policy" "main_bucket" {
       members = binding.value
     }
   }
-
+  # this role include all from snowflake_bucket_access but not the "storage.buckets.get" permission
   dynamic "binding" {
     for_each = var.users == [] ? [] : [var.users]
     content {
       role    = "roles/storage.objectUser"
+      members = binding.value
+    }
+  }
+
+  dynamic "binding" {
+    for_each = var.users == [] ? [] : [var.users]
+    content {
+      role    = google_project_iam_custom_role.snowflake_bucket_access.id
       members = binding.value
     }
   }
