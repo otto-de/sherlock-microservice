@@ -23,7 +23,7 @@ variable "admins" {
   default     = []
 }
 
-variable "bucketViewers" {
+variable "bucket_viewers" {
   description = "IAM-style members who will be granted roles/storage.bucketViewer on bucket."
   type        = list(string)
   default     = []
