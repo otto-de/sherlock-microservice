@@ -1,5 +1,13 @@
 data "google_iam_policy" "main_bucket" {
   dynamic "binding" {
+    for_each = var.bucketViewers == [] ? [] : [var.bucketViewers]
+    content {
+      role    = "roles/storage.bucketViewer"
+      members = binding.value
+    }
+  }
+
+  dynamic "binding" {
     for_each = var.admins == [] ? [] : [var.admins]
     content {
       role    = "roles/storage.objectAdmin"
