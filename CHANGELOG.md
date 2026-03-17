@@ -1,5 +1,7 @@
 # Changelog
 
+## v0.0.87 Add NoopClient for GCP ErrorReporting
+
 ## v0.0.84 Allow versioning of Cloud Buckets
 
 ## v0.0.83 Expose url of Cloud Bucket
