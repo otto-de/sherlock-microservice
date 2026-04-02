@@ -1,8 +1,6 @@
 module github.com/otto-de/sherlock-microservice
 
-go 1.24.0
-
-toolchain go1.24.1
+go 1.26.0
 
 require (
 	cloud.google.com/go/compute/metadata v0.5.0
