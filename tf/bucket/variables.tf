@@ -53,3 +53,10 @@ variable "versioning_enabled" {
   type        = bool
   default     = false
 }
+
+variable "archived_version_retention_days" {
+  description = "Number of days to keep archived (noncurrent) object versions before deleting them. Requires versioning_enabled to be true. Null disables the rule."
+  type        = number
+  nullable    = true
+  default     = null
+}
