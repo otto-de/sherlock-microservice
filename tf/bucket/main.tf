@@ -52,6 +52,19 @@ resource "google_storage_bucket" "main" {
       retention_period = each.retention_period
     }
   }
+
+  dynamic "lifecycle_rule" {
+    for_each = var.archived_version_retention_days == null ? [] : [var.archived_version_retention_days]
+    content {
+      action {
+        type = "Delete"
+      }
+      condition {
+        with_state                 = "ARCHIVED"
+        days_since_noncurrent_time = lifecycle_rule.value
+      }
+    }
+  }
 }
 
 resource "google_storage_bucket_iam_policy" "main" {
