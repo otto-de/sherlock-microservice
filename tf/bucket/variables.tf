@@ -42,10 +42,12 @@ variable "users" {
 }
 
 variable "retention_policy" {
-  type        = map(any)
+  type = object({
+    retention_period = number
+  })
   nullable    = true
   default     = null
-  description = "Configuration of the bucket's data retention policy for how long objects in the bucket should be retained."
+  description = "Data retention policy for the bucket. retention_period is the minimum duration in seconds that objects must be retained. Null disables the policy."
 }
 
 variable "versioning_enabled" {
