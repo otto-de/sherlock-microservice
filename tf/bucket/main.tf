@@ -49,7 +49,7 @@ resource "google_storage_bucket" "main" {
   dynamic "retention_policy" {
     for_each = var.retention_policy == null ? [] : [var.retention_policy]
     content {
-      retention_period = each.retention_period
+      retention_period = retention_policy.value.retention_period
     }
   }
 

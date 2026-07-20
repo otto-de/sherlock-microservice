@@ -1,5 +1,7 @@
 # Changelog
 
+## v0.0.93 Fix data retention policy for Cloud Buckets
+
 ## v0.0.92 Allow expiring archived Cloud Bucket versions
 
 ## v0.0.91 Update to lastest Kubernetes version
