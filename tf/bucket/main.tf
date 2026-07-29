@@ -54,14 +54,13 @@ resource "google_storage_bucket" "main" {
   }
 
   dynamic "lifecycle_rule" {
-    for_each = var.archived_version_retention_days == null ? [] : [var.archived_version_retention_days]
+    for_each = var.object_ttl_days == null ? [] : [var.object_ttl_days]
     content {
       action {
         type = "Delete"
       }
       condition {
-        with_state                 = "ARCHIVED"
-        days_since_noncurrent_time = lifecycle_rule.value
+        age = lifecycle_rule.value
       }
     }
   }

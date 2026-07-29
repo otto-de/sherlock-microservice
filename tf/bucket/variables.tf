@@ -56,8 +56,8 @@ variable "versioning_enabled" {
   default     = false
 }
 
-variable "archived_version_retention_days" {
-  description = "Number of days to keep archived (noncurrent) object versions before deleting them. Requires versioning_enabled to be true. Null disables the rule."
+variable "object_ttl_days" {
+  description = "Maximum age in days before an object in the bucket is deleted. Null disables the rule."
   type        = number
   nullable    = true
   default     = null
