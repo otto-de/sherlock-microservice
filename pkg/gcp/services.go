@@ -8,7 +8,7 @@ import (
 
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/logging"
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/v2"
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/otto-de/sherlock-microservice/pkg/gke"
 	"go.opentelemetry.io/otel/sdk/resource"
