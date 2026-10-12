@@ -72,9 +72,10 @@ resource "google_container_cluster" "main" {
     ]
   }
 
-  managed_opentelemetry_config {
-    scope = "COLLECTION_AND_INSTRUMENTATION_COMPONENTS"
-  }
+  # Configure this as soon as this attribute is no longer beta
+  # managed_opentelemetry_config {
+  #   scope = "COLLECTION_AND_INSTRUMENTATION_COMPONENTS"
+  # }
 
   monitoring_config {
     enable_components = var.enable_monitoring_components
