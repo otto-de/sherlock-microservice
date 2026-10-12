@@ -9,6 +9,10 @@ resource "google_container_cluster" "main" {
 
   min_master_version = var.container_engine_version.latest_master_version
 
+  cost_management_config {
+    enabled = true
+  }
+
   vertical_pod_autoscaling {
     enabled = true
   }
@@ -66,6 +70,10 @@ resource "google_container_cluster" "main" {
     ignore_changes = [
       dns_config,
     ]
+  }
+
+  managed_opentelemetry_config {
+    scope = "COLLECTION_AND_INSTRUMENTATION_COMPONENTS"
   }
 
   monitoring_config {
