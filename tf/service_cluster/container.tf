@@ -72,4 +72,12 @@ resource "google_container_cluster" "main" {
     enable_components = var.enable_monitoring_components
   }
 
+  secret_manager_config {
+    enabled = true
+
+    rotation_config {
+      enabled           = true
+      rotation_interval = "120s"
+    }
+  }
 }
