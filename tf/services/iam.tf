@@ -12,13 +12,13 @@ locals {
     members = [
       "serviceAccount:service-${var.project.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com",
     ] }, {
-    role = "roles/notebooks.serviceAgent"
-    members = [
-      "serviceAccount:service-${var.project.number}@gcp-sa-notebooks.iam.gserviceaccount.com",
-    ] }, {
     role = "roles/ml.serviceAgent"
     members = [
       "serviceAccount:service-${var.project.number}@cloud-ml.google.com.iam.gserviceaccount.com",
+    ] }, {
+    role = "roles/notebooks.serviceAgent"
+    members = [
+      "serviceAccount:service-${var.project.number}@gcp-sa-notebooks.iam.gserviceaccount.com",
     ]
   }]
   redis_bindings = [{
@@ -27,10 +27,14 @@ locals {
       "serviceAccount:service-${var.project.number}@cloud-redis.iam.gserviceaccount.com",
     ]
   }]
-  bindings = concat([{
+  unsorted_bindings = concat([{
     role = "roles/bigquerydatatransfer.serviceAgent"
     members = [
       "serviceAccount:service-${var.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com",
+    ] }, {
+    role = "roles/compute.serviceAgent"
+    members = [
+      data.google_compute_default_service_account.default.member,
     ] }, {
     role = "roles/container.defaultNodeServiceAgent"
     members = [
@@ -52,10 +56,6 @@ locals {
     members = [
       "serviceAccount:service-${var.project.number}@gcp-sa-containerscanning.iam.gserviceaccount.com",
     ] }, {
-    role = "roles/compute.serviceAgent"
-    members = [
-      data.google_compute_default_service_account.default.member,
-    ] }, {
     role = "roles/eventarc.serviceAgent"
     members = [
       "serviceAccount:service-${var.project.number}@gcp-sa-eventarc.iam.gserviceaccount.com",
@@ -64,17 +64,17 @@ locals {
     members = [
       "serviceAccount:service-${var.project.number}@gcp-sa-logging.iam.gserviceaccount.com",
     ] }, {
-    role = "roles/networkmanagement.serviceAgent"
+    role = "roles/memorystore.serviceAgent"
     members = [
-      "serviceAccount:service-${var.project.number}@gcp-sa-networkmanagement.iam.gserviceaccount.com",
+      "serviceAccount:service-${var.project.number}@gcp-sa-memorystore.iam.gserviceaccount.com",
     ] }, {
     role = "roles/networkconnectivity.serviceAgent"
     members = [
       "serviceAccount:service-${var.project.number}@gcp-sa-networkconnectivity.iam.gserviceaccount.com",
     ] }, {
-    role = "roles/memorystore.serviceAgent"
+    role = "roles/networkmanagement.serviceAgent"
     members = [
-      "serviceAccount:service-${var.project.number}@gcp-sa-memorystore.iam.gserviceaccount.com",
+      "serviceAccount:service-${var.project.number}@gcp-sa-networkmanagement.iam.gserviceaccount.com",
     ] }, {
     role = "roles/pubsub.serviceAgent"
     members = [
@@ -92,6 +92,8 @@ locals {
     var.enable_ml ? local.ml_bindings : [],
     var.enable_redis ? local.redis_bindings : [],
   )
+  bindings_by_role = { for b in local.unsorted_bindings : b.role => b }
+  bindings         = [for role in sort(keys(local.bindings_by_role)) : local.bindings_by_role[role]]
 }
 
 # This just ensures that the correct service agent roles
