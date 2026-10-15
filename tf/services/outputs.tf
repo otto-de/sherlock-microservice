@@ -6,6 +6,14 @@ output "bindings" {
   ]
 }
 
+output "dns_service" {
+  value = google_project_service.dns
+
+  depends_on = [
+    google_project_iam_binding.default,
+  ]
+}
+
 output "logging_service" {
   value = google_project_service.logging
 
