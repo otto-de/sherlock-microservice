@@ -22,6 +22,14 @@ output "logging_service" {
   ]
 }
 
+output "secretmanager_service" {
+  value = google_project_service.secretmanager
+
+  depends_on = [
+    google_project_iam_binding.default,
+  ]
+}
+
 output "servicenetworking_service" {
   value = google_project_service.servicenetworking
 
