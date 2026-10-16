@@ -1,39 +1,36 @@
-output "bindings" {
+output "iam_bindings" {
   value = local.bindings
 
   depends_on = [
-    google_project_iam_binding.default,
-  ]
-}
-
-output "dns_service" {
-  value = google_project_service.dns
-
-  depends_on = [
-    google_project_iam_binding.default,
-  ]
-}
-
-output "logging_service" {
-  value = google_project_service.logging
-
-  depends_on = [
-    google_project_iam_binding.default,
-  ]
-}
-
-output "secretmanager_service" {
-  value = google_project_service.secretmanager
-
-  depends_on = [
-    google_project_iam_binding.default,
-  ]
-}
-
-output "servicenetworking_service" {
-  value = google_project_service.servicenetworking
-
-  depends_on = [
-    google_project_iam_binding.default,
+    google_project_service.aiplatform,
+    google_project_service.bigquerydatatransfer,
+    google_project_service.cloudbuild,
+    google_project_service.clouderrorreporting,
+    google_project_service.cloudresourcemanager,
+    google_project_service.cloudtrace,
+    google_project_service.compute,
+    google_project_service.container,
+    google_project_service.containeranalysis,
+    google_project_service.containerscanning,
+    google_project_service.containersecurity,
+    google_project_service.dns,
+    google_project_service.eventarc,
+    google_project_service.eventarcpublishing,
+    google_project_service.iam,
+    google_project_service.iamcredentials,
+    google_project_service.iap,
+    google_project_service.logging,
+    google_project_service.memorystore,
+    google_project_service.ml,
+    google_project_service.networkconnectivity,
+    google_project_service.networkmanagement,
+    google_project_service.notebooks,
+    google_project_service.observability,
+    google_project_service.pubsub,
+    google_project_service.redis,
+    google_project_service.secretmanager,
+    google_project_service.servicenetworking,
+    google_project_service.serviceusage,
+    google_project_service.vpcaccess,
   ]
 }
