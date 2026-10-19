@@ -1,14 +1,10 @@
-variable "bucket" {
-  type = object({
-    id = string
-  })
+variable "bucket_config" {
+  type = map(object({
+    object_name_prefix = string
+  }))
 }
 
 variable "message_retention_duration" {
-  type = string
-}
-
-variable "object_name_prefix" {
   type = string
 }
 

@@ -1,8 +1,10 @@
 resource "google_storage_notification" "default" {
-  bucket             = var.bucket.id
+  for_each = var.bucket_config
+
+  bucket             = each.key
   payload_format     = "JSON_API_V1"
   topic              = google_pubsub_topic.default.id
-  object_name_prefix = var.object_name_prefix
+  object_name_prefix = each.value.object_name_prefix
   event_types        = ["OBJECT_FINALIZE"]
 
   depends_on = [
