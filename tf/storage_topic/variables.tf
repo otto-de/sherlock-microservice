@@ -18,10 +18,8 @@ variable "subscribers" {
   }))
 }
 
-variable "topic" {
-  type = object({
-    id = string
-  })
+variable "topic_name" {
+  type = string
 }
 
 variable "viewers" {

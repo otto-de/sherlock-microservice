@@ -19,6 +19,6 @@ data "google_iam_policy" "topic" {
 }
 
 resource "google_pubsub_topic_iam_policy" "default" {
-  topic       = var.topic.id
+  topic       = google_pubsub_topic.default.id
   policy_data = data.google_iam_policy.topic.policy_data
 }
