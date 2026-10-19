@@ -1,5 +1,5 @@
 resource "google_storage_notification" "default" {
-  for_each = var.bucket_config
+  for_each = var.bucket_configs
 
   bucket             = each.key
   payload_format     = "JSON_API_V1"
