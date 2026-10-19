@@ -1,5 +1,4 @@
 data "google_storage_project_service_account" "default" {
-  project = var.project.name
 }
 
 data "google_iam_policy" "topic" {
