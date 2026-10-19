@@ -1,4 +1,4 @@
-variable "bucket_config" {
+variable "bucket_configs" {
   type = map(object({
     object_name_prefix = string
   }))
