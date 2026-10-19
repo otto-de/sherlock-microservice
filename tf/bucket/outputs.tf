@@ -1,3 +1,9 @@
+
+output "id" {
+  description = "The ID of the bucket."
+  value       = google_storage_bucket.main.id
+}
+
 output "name" {
   description = "The name of the bucket."
   value       = google_storage_bucket.main.name
