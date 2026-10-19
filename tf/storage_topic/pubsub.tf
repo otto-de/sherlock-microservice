@@ -1,0 +1,11 @@
+resource "google_pubsub_topic" "default" {
+  name = "default"
+
+  message_retention_duration = var.message_retention_duration
+
+  message_storage_policy {
+    allowed_persistence_regions = [
+      "europe-west1",
+    ]
+  }
+}

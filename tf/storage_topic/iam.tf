@@ -1,0 +1,25 @@
+data "google_storage_project_service_account" "default" {
+  project = var.project.name
+}
+
+data "google_iam_policy" "topic" {
+  binding {
+    role = "roles/pubsub.publisher"
+    members = [
+      data.google_storage_project_service_account.default.member,
+    ]
+  }
+  binding {
+    role    = "roles/pubsub.subscriber"
+    members = var.subscribers[*].member
+  }
+  binding {
+    role    = "roles/pubsub.viewer"
+    members = var.viewers[*].member
+  }
+}
+
+resource "google_pubsub_topic_iam_policy" "default" {
+  topic       = var.topic.id
+  policy_data = data.google_iam_policy.topic.policy_data
+}
