@@ -16,6 +16,7 @@ EOT
 variable "enable_message_ordering" {
   description = "Whether to enable message ordering for the Pub/Sub subscription."
   type        = bool
+  default     = false
 }
 
 variable "filter" {
