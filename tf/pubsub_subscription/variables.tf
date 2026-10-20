@@ -1,3 +1,9 @@
+variable "ack_deadline_seconds" {
+  description = "Seconds Pub/Sub waits for an acknowledgement before redelivering (10-600). Null uses the provider default."
+  type        = number
+  default     = null
+}
+
 variable "deadletter_message_retention_duration" {
   description = <<EOT
 How long to retain unacknowledged messages in the subscription's backlog,
@@ -10,6 +16,12 @@ EOT
 variable "enable_message_ordering" {
   description = "Whether to enable message ordering for the Pub/Sub subscription."
   type        = bool
+}
+
+variable "filter" {
+  description = "Pub/Sub filter expression; only matching messages are delivered. Null delivers all messages."
+  type        = string
+  default     = null
 }
 
 variable "subscription_message_retention_duration" {
