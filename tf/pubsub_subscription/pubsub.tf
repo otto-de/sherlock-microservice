@@ -11,7 +11,7 @@ resource "google_pubsub_subscription" "default" {
 }
 
 resource "google_pubsub_topic" "deadletter" {
-  name = var.subscription_name + "-deadletter"
+  name = "${var.subscription_name}-deadletter"
 
   message_retention_duration = var.deadletter_message_retention_duration
 
