@@ -3,6 +3,7 @@ resource "google_pubsub_subscription" "default" {
 
   topic                      = var.topic.id
   message_retention_duration = var.subscription_message_retention_duration
+  enable_message_ordering    = var.enable_message_ordering
 
   dead_letter_policy {
     dead_letter_topic = google_pubsub_topic.deadletter.id

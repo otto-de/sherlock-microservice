@@ -7,6 +7,11 @@ EOT
   type        = string
 }
 
+variable "enable_message_ordering" {
+  description = "Whether to enable message ordering for the Pub/Sub subscription."
+  type        = bool
+}
+
 variable "subscription_message_retention_duration" {
   description = <<EOT
 How long to retain unacknowledged messages in the subscription's backlog,
