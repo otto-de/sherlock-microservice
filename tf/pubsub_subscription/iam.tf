@@ -1,6 +1,3 @@
-data "google_project" "default" {
-}
-
 data "google_iam_policy" "deadletter_topic" {
 
   binding {
