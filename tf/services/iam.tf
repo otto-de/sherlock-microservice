@@ -21,6 +21,9 @@ locals {
       "serviceAccount:service-${var.project.number}@cloud-redis.iam.gserviceaccount.com",
     ]
   }
+  pubsub_identity = {
+    member = "serviceAccount:service-${var.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  }
   base_bindings = {
     "roles/bigquerydatatransfer.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com",
@@ -59,7 +62,7 @@ locals {
       "serviceAccount:service-${var.project.number}@gcp-sa-networkmanagement.iam.gserviceaccount.com",
     ]
     "roles/pubsub.serviceAgent" = [
-      "serviceAccount:service-${var.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com",
+      local.pubsub_identity,
     ]
     "roles/servicenetworking.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@service-networking.iam.gserviceaccount.com",

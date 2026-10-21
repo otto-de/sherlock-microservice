@@ -43,6 +43,10 @@ output "logging_service" {
   value = google_project_service.logging
 }
 
+output "pubsub_identity" {
+  value = local.pubsub_identity
+}
+
 output "secretmanager_service" {
   value = google_project_service.secretmanager
 }
