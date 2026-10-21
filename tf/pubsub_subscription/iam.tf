@@ -28,7 +28,7 @@ data "google_iam_policy" "subscription" {
 
 locals {
   pubsub_identity = {
-    member = "serviceAccount:service-${var.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+    member = "serviceAccount:service-${data.google_project.default.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
   }
 }
 
