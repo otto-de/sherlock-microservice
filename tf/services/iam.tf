@@ -62,7 +62,7 @@ locals {
       "serviceAccount:service-${var.project.number}@gcp-sa-networkmanagement.iam.gserviceaccount.com",
     ]
     "roles/pubsub.serviceAgent" = [
-      local.pubsub_identity,
+      local.pubsub_identity.member,
     ]
     "roles/servicenetworking.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@service-networking.iam.gserviceaccount.com",
