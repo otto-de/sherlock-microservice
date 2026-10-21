@@ -4,7 +4,7 @@ data "google_project" "default" {
 data "google_iam_policy" "deadletter_topic" {
 
   binding {
-    role    = "roles/pubsub.publisher"
+    role = "roles/pubsub.publisher"
     members = [
       local.pubsub_identity.member,
     ]
@@ -13,7 +13,7 @@ data "google_iam_policy" "deadletter_topic" {
 
 data "google_iam_policy" "subscription" {
   binding {
-    role    = "roles/pubsub.subscriber"
+    role = "roles/pubsub.subscriber"
     members = distinct(concat(
       var.subscribers[*].member,
       # The service agent needs subscriber on the source subscription to forward dead letters.
@@ -21,8 +21,14 @@ data "google_iam_policy" "subscription" {
     ))
   }
   binding {
-    role = "roles/pubsub.viewer"
+    role    = "roles/pubsub.viewer"
     members = var.viewers[*].member
+  }
+}
+
+locals {
+  pubsub_identity = {
+    member = "serviceAccount:service-${var.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
   }
 }
 
