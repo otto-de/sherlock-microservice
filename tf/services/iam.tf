@@ -4,7 +4,9 @@ locals {
       "serviceAccount:service-${var.project.number}@gcp-sa-aiplatform-cc.iam.gserviceaccount.com",
     ]
     "roles/aiplatform.serviceAgent" = [
+      "serviceAccount:service-${var.project.number}@gcp-sa-aiplatform.iam.gserviceaccount.com"
       "serviceAccount:service-${var.project.number}@gcp-sa-aiplatform-ft.iam.gserviceaccount.com",
+      "serviceAccount:service-${var.project.number}@gcp-sa-aiplatform-pie.iam.gserviceaccount.com",
     ]
     "roles/cloudbuild.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com",
