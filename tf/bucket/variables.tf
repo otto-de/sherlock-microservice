@@ -1,22 +1,3 @@
-
-variable "name" {
-  description = "The name of the bucket."
-  type        = string
-}
-
-variable "location" {
-  description = "The Google Cloud Storage location"
-  type        = string
-  default     = "europe-west1"
-}
-
-variable "force_destroy" {
-  description = "When deleting a bucket, this boolean option will delete all contained objects. If you try to delete a bucket that contains objects, Terraform will fail that run."
-  type        = bool
-  default     = false
-}
-
-
 variable "admins" {
   description = "IAM-style members who will be granted roles/storage.objectAdmin on bucket."
   type        = list(string)
@@ -29,16 +10,47 @@ variable "bucket_viewers" {
   default     = []
 }
 
-variable "viewers" {
-  description = "IAM-style members who will be granted roles/storage.objectViewer on bucket."
-  type        = list(string)
-  default     = []
+variable "force_destroy" {
+  description = "When deleting a bucket, this boolean option will delete all contained objects. If you try to delete a bucket that contains objects, Terraform will fail that run."
+  type        = bool
+  default     = false
 }
 
-variable "users" {
-  description = "IAM-style members who will be granted roles/storage.objectUser on bucket."
-  type        = list(string)
-  default     = []
+variable "labels" {
+  description = "Labels to attach to the bucket."
+  type        = map(string)
+  default     = {}
+}
+
+variable "location" {
+  description = "The Google Cloud Storage location"
+  type        = string
+  default     = "europe-west1"
+}
+
+variable "name" {
+  description = "The name of the bucket."
+  type        = string
+}
+
+variable "object_ttl_days" {
+  description = "Maximum age in days before an object in the bucket is deleted. Null disables the rule."
+  type        = number
+  nullable    = true
+  default     = null
+}
+
+variable "prevent_destroy" {
+  description = "Prevents destruction of the bucket."
+  type        = bool
+  default     = false
+}
+
+variable "project" {
+  description = "The project ID of the bucket. Null uses the provider default."
+  type        = string
+  nullable    = true
+  default     = null
 }
 
 variable "retention_policy" {
@@ -50,15 +62,33 @@ variable "retention_policy" {
   description = "Data retention policy for the bucket. retention_period is the minimum duration in seconds that objects must be retained. Null disables the policy."
 }
 
+variable "soft_delete_retention_seconds" {
+  description = "Duration in seconds that deleted objects are retained. Null keeps the provider default; 0 disables soft delete."
+  type        = number
+  nullable    = true
+  default     = null
+}
+
+variable "storage_class" {
+  description = "The storage class of the bucket."
+  type        = string
+  default     = "STANDARD"
+}
+
+variable "users" {
+  description = "IAM-style members who will be granted roles/storage.objectUser on bucket."
+  type        = list(string)
+  default     = []
+}
+
 variable "versioning_enabled" {
   description = "While set to true, versioning is fully enabled for this bucket."
   type        = bool
   default     = false
 }
 
-variable "object_ttl_days" {
-  description = "Maximum age in days before an object in the bucket is deleted. Null disables the rule."
-  type        = number
-  nullable    = true
-  default     = null
+variable "viewers" {
+  description = "IAM-style members who will be granted roles/storage.objectViewer on bucket."
+  type        = list(string)
+  default     = []
 }

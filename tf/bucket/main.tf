@@ -37,13 +37,23 @@ resource "google_storage_bucket" "main" {
   name = var.name
 
   location = var.location
+  project  = var.project
 
   force_destroy               = var.force_destroy
   public_access_prevention    = "enforced"
   uniform_bucket_level_access = true
+  storage_class               = var.storage_class
+  labels                      = var.labels
 
   versioning {
     enabled = var.versioning_enabled
+  }
+
+  dynamic "soft_delete_policy" {
+    for_each = var.soft_delete_retention_seconds == null ? [] : [var.soft_delete_retention_seconds]
+    content {
+      retention_duration_seconds = soft_delete_policy.value
+    }
   }
 
   dynamic "retention_policy" {
@@ -63,6 +73,10 @@ resource "google_storage_bucket" "main" {
         age = lifecycle_rule.value
       }
     }
+  }
+
+  lifecycle {
+    prevent_destroy = var.prevent_destroy
   }
 }
 
