@@ -45,7 +45,7 @@ func NewLoggerProviderWithProjectExporter(
 	}
 
 	detectCtx, cancel := context.WithTimeout(
-		context.Background(),
+		ctx,
 		5*time.Second,
 	)
 	defer cancel()
@@ -56,7 +56,7 @@ func NewLoggerProviderWithProjectExporter(
 		resource.WithTelemetrySDK(),
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "detect GCP resource: %w", err)
+		fmt.Fprintf(os.Stderr, "detect GCP resource: %v\n", err)
 	}
 
 	res, err := resource.Merge(detected, cfg.resource)
