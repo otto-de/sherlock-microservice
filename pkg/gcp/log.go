@@ -3,11 +3,15 @@ package gcp
 import (
 	"context"
 	"fmt"
+	"os"
+	"time"
 
+	gcpdetector "go.opentelemetry.io/contrib/detectors/gcp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/oauth"
 )
@@ -39,14 +43,34 @@ func NewLoggerProviderWithProjectExporter(
 	for _, opt := range opts {
 		opt(&cfg)
 	}
-	res, err := resource.Merge(resource.Default(), cfg.resource)
+
+	detectCtx, cancel := context.WithTimeout(
+		context.Background(),
+		5*time.Second,
+	)
+	defer cancel()
+
+	detected, err := resource.New(detectCtx,
+		resource.WithDetectors(gcpdetector.NewDetector()),
+		resource.WithFromEnv(),
+		resource.WithTelemetrySDK(),
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "detect GCP resource: %w", err)
+	}
+
+	res, err := resource.Merge(detected, cfg.resource)
 	if err != nil {
 		return nil, fmt.Errorf("merge log resource: %w", err)
 	}
-	res = resource.NewSchemaless(append(res.Attributes(),
-		attribute.String("service.name", serviceName),
-		attribute.String("gcp.project_id", project),
-	)...)
+	res = resource.NewWithAttributes(
+		res.SchemaURL(),
+		append(res.Attributes(),
+			attribute.String("gcp.project_id", project),
+			semconv.ServiceName(serviceName),
+		)...,
+	)
+
 	if cfg.exporter == nil {
 		auth, err := oauth.NewApplicationDefault(ctx, "https://www.googleapis.com/auth/cloud-platform")
 		if err != nil {
