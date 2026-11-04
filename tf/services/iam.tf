@@ -8,6 +8,9 @@ locals {
       "serviceAccount:service-${var.project.number}@gcp-sa-aiplatform-ft.iam.gserviceaccount.com",
       "serviceAccount:service-${var.project.number}@gcp-sa-aiplatform-pie.iam.gserviceaccount.com",
     ]
+    "roles/aiplatform.telemetryServiceAgent" = [
+      "serviceAccount:service-${var.project.number}@gcp-sa-vertex-telemetry.iam.gserviceaccount.com",
+    ]
     "roles/cloudbuild.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com",
     ]
