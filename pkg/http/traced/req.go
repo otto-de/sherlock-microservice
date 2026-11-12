@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/GoogleCloudPlatform/opentelemetry-operations-go/propagator"
 	"go.opentelemetry.io/otel/propagation"
 )
 
@@ -21,7 +20,10 @@ func NewIdempotentPostRequestWithContext(ctx context.Context, url string, body i
 	// According to https://github.com/golang/go/commit/bfd9b94069e74b0c6516a045cbb83bf1024a1269
 	// this lets the underlying Go transport retry
 	r.Header.Set("Idempotency-Key", "x")
-	propagator.CloudTraceFormatPropagator{}.Inject(ctx, propagation.HeaderCarrier(r.Header))
+	propagation.TraceContext{}.Inject(
+		ctx,
+		propagation.HeaderCarrier(r.Header),
+	)
 
 	return r, nil
 }

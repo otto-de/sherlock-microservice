@@ -5,15 +5,20 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/logging"
 	"cloud.google.com/go/pubsub"
-	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/otto-de/sherlock-microservice/pkg/gke"
+	"go.opentelemetry.io/otel/attribute"
+	texporter "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.43.0"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/oauth"
 )
 
 // Services contains all Google Cloud Services that
@@ -50,6 +55,7 @@ type discoveryOption struct {
 	gkeAutoDiscoverMetaData bool
 	discoverPubSub          bool
 	traceExporterOption     texporter.Option
+	traceProviderResource   *resource.Resource
 }
 
 func WithKubernetes(clusterName, namespace, pod, containerName string) discoveryOption {
@@ -96,6 +102,13 @@ func WithGKEAutoDiscoverMetaData() discoveryOption {
 func WithTraceExporterOption(to texporter.Option) discoveryOption {
 	return discoveryOption{
 		traceExporterOption: to,
+	}
+}
+
+// Use this instead of https://pkg.go.dev/go.opentelemetry.io/otel/sdk/trace#WithResource which gets overwritten
+func WithTraceProviderResource(tr *resource.Resource) discoveryOption {
+	return discoveryOption{
+		traceProviderResource: tr,
 	}
 }
 
@@ -149,14 +162,35 @@ func discoverServices(project, serviceName string, tracerProviderOptions []sdktr
 		panic(err)
 	}
 
-	traceExporterOptions := []texporter.Option{texporter.WithProjectID(project)}
+	ctx := context.Background()
+
+	crd, err := oauth.NewApplicationDefault(
+		ctx,
+		cloudPlatformScope,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("configure trace credentials: %w", err)
+	}
+
+	traceExporterOptions := []texporter.Option{
+		texporter.WithEndpointURL(telemetryEndpoint),
+		texporter.WithDialOption(grpc.WithPerRPCCredentials(crd)),
+	}
+	var traceResource *resource.Resource
 	for _, opt := range opts {
 		if opt.traceExporterOption != nil {
 			traceExporterOptions = append(traceExporterOptions, opt.traceExporterOption)
 		}
+		if opt.traceProviderResource != nil {
+			traceResource, err = resource.Merge(traceResource, opt.traceProviderResource)
+			if err != nil {
+				return nil, fmt.Errorf("merge trace resource: %w", err)
+			}
+
+		}
 	}
 
-	exporter, err := texporter.New(traceExporterOptions...)
+	exporter, err := texporter.New(ctx, traceExporterOptions...)
 	if err != nil {
 		panic(err)
 	}
@@ -166,10 +200,7 @@ func discoverServices(project, serviceName string, tracerProviderOptions []sdktr
 		ErrorReporting: errorClient,
 	}
 
-	ctx := context.Background()
-
 	discoverPubSub := false
-	var traceResource *resource.Resource
 	for _, opt := range opts {
 		if opt.gkeAutoDiscoverMetaData {
 			metadata, err := gke.GetMetaData(ctx)
@@ -182,16 +213,27 @@ func discoverServices(project, serviceName string, tracerProviderOptions []sdktr
 			}
 
 			s.MonitoredResource = gke.MonitoredResourceFromMetaData(metadata)
-			traceResource = gke.TraceResourceFromMetaData(serviceName, metadata)
+			traceResource, err = resource.Merge(traceResource, gke.TraceResourceFromMetaData(serviceName, metadata))
+			if err != nil {
+				return nil, fmt.Errorf("merge trace resource: %w", err)
+			}
 		} else if opt.pod != "" {
 			s.MonitoredResource = gke.MonitoredResource(ctx, s.Logging, project, opt.clusterName, opt.namespace, opt.pod, opt.containerName)
 		} else if opt.discoverPubSub {
 			discoverPubSub = true
 		}
 	}
-	if traceResource != nil {
-		tracerProviderOptions = append(tracerProviderOptions, sdktrace.WithResource(traceResource))
+
+	traceResource, err = resource.Merge(traceResource, resource.NewSchemaless(
+		attribute.String("gcp.project_id", project),
+		semconv.ServiceName(serviceName),
+	))
+	if err != nil {
+		return nil, fmt.Errorf("merge trace resource: %w", err)
 	}
+
+	tracerProviderOptions = append(tracerProviderOptions, sdktrace.WithResource(traceResource))
+
 	if discoverPubSub {
 		s.PubSub, err = pubsub.NewClient(ctx, project)
 		if err != nil {
@@ -211,7 +253,14 @@ func (s *Services) Close() {
 	if s.PubSub != nil {
 		s.PubSub.Close()
 	}
-	s.TracerProvider.ForceFlush(context.Background()) // flushes any pending spans
+
+	tCtx, cancel := context.WithTimeout(
+		context.Background(),
+		5*time.Second,
+	)
+	defer cancel()
+
+	s.TracerProvider.Shutdown(tCtx) // flushes any pending spans
 	s.ErrorReporting.Close()
 	s.Logging.Close()
 }
