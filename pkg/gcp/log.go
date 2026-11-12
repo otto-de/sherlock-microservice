@@ -11,7 +11,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.43.0"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/oauth"
 )
@@ -45,7 +45,7 @@ func NewLoggerProviderWithProjectExporter(
 	}
 
 	detectCtx, cancel := context.WithTimeout(
-		context.Background(),
+		ctx,
 		5*time.Second,
 	)
 	defer cancel()
@@ -56,7 +56,7 @@ func NewLoggerProviderWithProjectExporter(
 		resource.WithTelemetrySDK(),
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "detect GCP resource: %w", err)
+		fmt.Fprintf(os.Stderr, "detect GCP resource: %v\n", err)
 	}
 
 	res, err := resource.Merge(detected, cfg.resource)
@@ -72,12 +72,12 @@ func NewLoggerProviderWithProjectExporter(
 	)
 
 	if cfg.exporter == nil {
-		auth, err := oauth.NewApplicationDefault(ctx, "https://www.googleapis.com/auth/cloud-platform")
+		auth, err := oauth.NewApplicationDefault(ctx, cloudPlatformScope)
 		if err != nil {
 			return nil, fmt.Errorf("configure log credentials: %w", err)
 		}
 		cfg.exporter, err = otlploggrpc.New(ctx,
-			otlploggrpc.WithEndpointURL("https://telemetry.googleapis.com:443"),
+			otlploggrpc.WithEndpointURL(telemetryEndpoint),
 			otlploggrpc.WithDialOption(grpc.WithPerRPCCredentials(auth)),
 		)
 		if err != nil {
