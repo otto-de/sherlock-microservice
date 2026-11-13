@@ -9,7 +9,7 @@ import (
 
 	"cloud.google.com/go/errorreporting"
 	"cloud.google.com/go/logging"
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/v2"
 	"github.com/otto-de/sherlock-microservice/pkg/gke"
 	"go.opentelemetry.io/otel/attribute"
 	texporter "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
