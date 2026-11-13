@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/datastore v1.21.0
 	cloud.google.com/go/errorreporting v0.4.0
 	cloud.google.com/go/logging v1.13.1
-	cloud.google.com/go/pubsub v1.50.1
+	cloud.google.com/go/pubsub/v2 v2.0.0
 	github.com/cloudevents/sdk-go/protocol/pubsub/v2 v2.15.0
 	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/google/go-cmp v0.7.0
@@ -35,7 +35,7 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/iam v1.5.3 // indirect
 	cloud.google.com/go/longrunning v0.8.0 // indirect
-	cloud.google.com/go/pubsub/v2 v2.0.0 // indirect
+	cloud.google.com/go/pubsub v1.50.1 // indirect
 	cuelang.org/go v0.9.2 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Jeffail/gabs/v2 v2.7.0 // indirect

@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.0.133 Migrate to cloud.google.com/go/pubsub/v2
+- Anything PubSub in the gcp module is now v2, so consumers need to be on v2 to use it.
+
 ## v0.0.92 Allow setting TTL for bucket objects, remove days since nonconcurrent deletion
 
 ## v0.0.93 Fix data retention policy for Cloud Buckets
