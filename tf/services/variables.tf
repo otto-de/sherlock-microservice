@@ -1,3 +1,8 @@
+variable "enable_artifactregistry" {
+  type    = bool
+  default = false
+}
+
 variable "enable_bigquery" {
   type    = bool
   default = false

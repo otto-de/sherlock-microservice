@@ -1,4 +1,9 @@
 locals {
+  artifactregistry_bindings = {
+    "roles/artifactregistry.serviceAgent" = [
+      "serviceAccount:service-${var.project.number}@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+    ]
+  }
   bigquery_bindings = {
     "roles/bigquerydatatransfer.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com",
@@ -87,6 +92,7 @@ locals {
   }
   bindings = merge(
     local.base_bindings,
+    var.enable_artifactregistry ? local.artifactregistry_bindings : {},
     var.enable_bigquery ? local.bigquery_bindings : {},
     var.enable_eventarc ? local.eventarc_bindings : {},
     var.enable_memorystore ? local.memorystore_bindings : {},
