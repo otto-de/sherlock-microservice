@@ -2,9 +2,13 @@
 module "defs" {
   source = "../services"
 
-  enable_ml    = var.enable_ml
-  enable_redis = var.enable_redis
-  project      = var.project
+  enable_bigquery    = var.enable_bigquery
+  enable_eventarc    = var.enable_eventarc
+  enable_memorystore = var.enable_memorystore
+  enable_ml          = var.enable_ml
+  enable_pubsub      = var.enable_pubsub
+  enable_redis       = var.enable_redis
+  project            = var.project
 }
 
 # This just ensures that the correct service agent roles
