@@ -28,6 +28,10 @@ resource "google_project_service" "bigquerydatatransfer" {
   service = "bigquerydatatransfer.googleapis.com"
 
   disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_bigquery
+  }
 }
 
 resource "google_project_service" "cloudbuild" {
@@ -116,12 +120,20 @@ resource "google_project_service" "eventarc" {
   service = "eventarc.googleapis.com"
 
   disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_eventarc
+  }
 }
 
 resource "google_project_service" "eventarcpublishing" {
   service = "eventarcpublishing.googleapis.com"
 
   disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_eventarc
+  }
 }
 
 resource "google_project_service" "iam" {
@@ -152,6 +164,10 @@ resource "google_project_service" "memorystore" {
   service = "memorystore.googleapis.com"
 
   disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_memorystore
+  }
 }
 
 resource "google_project_service" "ml" {
@@ -196,6 +212,10 @@ resource "google_project_service" "pubsub" {
   service = "pubsub.googleapis.com"
 
   disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_pubsub
+  }
 }
 
 resource "google_project_service" "redis" {
