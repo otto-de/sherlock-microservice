@@ -4,6 +4,16 @@ data "google_compute_default_service_account" "default" {
   ]
 }
 
+resource "google_project_service" "artifactregistry" {
+  service = "artifactregistry.googleapis.com"
+
+  disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_artifactregistry
+  }
+}
+
 resource "google_project_service" "aiplatform" {
   service = "aiplatform.googleapis.com"
 
