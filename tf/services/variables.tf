@@ -13,6 +13,11 @@ variable "enable_eventarc" {
   default = false
 }
 
+variable "enable_gke" {
+  type    = bool
+  default = false
+}
+
 variable "enable_memorystore" {
   type    = bool
   default = false

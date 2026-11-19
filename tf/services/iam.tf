@@ -14,6 +14,11 @@ locals {
       "serviceAccount:service-${var.project.number}@gcp-sa-eventarc.iam.gserviceaccount.com",
     ]
   }
+  gke_bindings = {
+    "roles/container.serviceAgent" = [
+      "serviceAccount:service-${var.project.number}@container-engine-robot.iam.gserviceaccount.com",
+    ]
+  }
   memorystore_bindings = {
     "roles/memorystore.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-memorystore.iam.gserviceaccount.com",
@@ -64,9 +69,6 @@ locals {
     "roles/container.nodeServiceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-gkenode.iam.gserviceaccount.com",
     ]
-    "roles/container.serviceAgent" = [
-      "serviceAccount:service-${var.project.number}@container-engine-robot.iam.gserviceaccount.com",
-    ]
     "roles/containeranalysis.ServiceAgent" = [
       "serviceAccount:service-${var.project.number}@container-analysis.iam.gserviceaccount.com",
     ]
@@ -95,6 +97,7 @@ locals {
     var.enable_artifactregistry ? local.artifactregistry_bindings : {},
     var.enable_bigquery ? local.bigquery_bindings : {},
     var.enable_eventarc ? local.eventarc_bindings : {},
+    var.enable_gke ? local.gke_bindings : {},
     var.enable_memorystore ? local.memorystore_bindings : {},
     var.enable_ml ? local.ml_bindings : {},
     var.enable_pubsub ? local.pubsub_bindings : {},

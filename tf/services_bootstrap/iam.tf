@@ -5,6 +5,7 @@ module "defs" {
   enable_artifactregistry = var.enable_artifactregistry
   enable_bigquery         = var.enable_bigquery
   enable_eventarc         = var.enable_eventarc
+  enable_gke              = var.enable_gke
   enable_memorystore      = var.enable_memorystore
   enable_ml               = var.enable_ml
   enable_pubsub           = var.enable_pubsub
