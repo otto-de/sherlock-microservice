@@ -3,7 +3,6 @@ locals {
 }
 
 resource "google_container_cluster" "main" {
-  provider         = google-beta
   name             = var.name
   enable_autopilot = true
 
