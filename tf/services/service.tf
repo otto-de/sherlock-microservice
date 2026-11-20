@@ -96,12 +96,20 @@ resource "google_project_service" "containeranalysis" {
   depends_on = [
     google_project_service.pubsub,
   ]
+
+  lifecycle {
+    enabled = var.enable_artifactregistry
+  }
 }
 
 resource "google_project_service" "containerscanning" {
   service = "containerscanning.googleapis.com"
 
   disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_artifactregistry
+  }
 }
 
 resource "google_project_service" "containersecurity" {

@@ -3,6 +3,12 @@ locals {
     "roles/artifactregistry.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-artifactregistry.iam.gserviceaccount.com"
     ]
+    "roles/containeranalysis.ServiceAgent" = [
+      "serviceAccount:service-${var.project.number}@container-analysis.iam.gserviceaccount.com",
+    ]
+    "roles/containerscanning.ServiceAgent" = [
+      "serviceAccount:service-${var.project.number}@gcp-sa-containerscanning.iam.gserviceaccount.com",
+    ]
   }
   bigquery_bindings = {
     "roles/bigquerydatatransfer.serviceAgent" = [
@@ -68,12 +74,6 @@ locals {
   base_bindings = {
     "roles/compute.serviceAgent" = [
       data.google_compute_default_service_account.default.member,
-    ]
-    "roles/containeranalysis.ServiceAgent" = [
-      "serviceAccount:service-${var.project.number}@container-analysis.iam.gserviceaccount.com",
-    ]
-    "roles/containerscanning.ServiceAgent" = [
-      "serviceAccount:service-${var.project.number}@gcp-sa-containerscanning.iam.gserviceaccount.com",
     ]
     "roles/logging.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-logging.iam.gserviceaccount.com",
