@@ -15,6 +15,12 @@ locals {
     ]
   }
   gke_bindings = {
+    "roles/container.defaultNodeServiceAgent" = [
+      "serviceAccount:service-${var.project.number}@gcp-sa-gkenode.iam.gserviceaccount.com",
+    ]
+    "roles/container.nodeServiceAgent" = [
+      "serviceAccount:service-${var.project.number}@gcp-sa-gkenode.iam.gserviceaccount.com",
+    ]
     "roles/container.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@container-engine-robot.iam.gserviceaccount.com",
     ]
@@ -62,12 +68,6 @@ locals {
   base_bindings = {
     "roles/compute.serviceAgent" = [
       data.google_compute_default_service_account.default.member,
-    ]
-    "roles/container.defaultNodeServiceAgent" = [
-      "serviceAccount:service-${var.project.number}@gcp-sa-gkenode.iam.gserviceaccount.com",
-    ]
-    "roles/container.nodeServiceAgent" = [
-      "serviceAccount:service-${var.project.number}@gcp-sa-gkenode.iam.gserviceaccount.com",
     ]
     "roles/containeranalysis.ServiceAgent" = [
       "serviceAccount:service-${var.project.number}@container-analysis.iam.gserviceaccount.com",

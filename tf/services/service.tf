@@ -108,6 +108,10 @@ resource "google_project_service" "containersecurity" {
   service = "containersecurity.googleapis.com"
 
   disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_gke
+  }
 }
 
 resource "google_project_service" "dns" {
