@@ -7,6 +7,7 @@ output "iam_bindings" {
 
   depends_on = [
     google_project_service.aiplatform,
+    google_project_service.artifactregistry,
     google_project_service.bigquerydatatransfer,
     google_project_service.cloudbuild,
     google_project_service.clouderrorreporting,
@@ -36,6 +37,7 @@ output "iam_bindings" {
     google_project_service.servicenetworking,
     google_project_service.serviceusage,
     google_project_service.vpcaccess,
+    google_project_service.workloadidentity,
   ]
 }
 

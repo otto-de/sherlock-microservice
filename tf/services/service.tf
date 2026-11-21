@@ -267,3 +267,9 @@ resource "google_project_service" "vpcaccess" {
 
   disable_on_destroy = false
 }
+
+resource "google_project_service" "workloadidentity" {
+  service = "workloadidentity.googleapis.com"
+
+  disable_on_destroy = false
+}
