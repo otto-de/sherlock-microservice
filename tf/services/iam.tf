@@ -15,6 +15,11 @@ locals {
       "serviceAccount:service-${var.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com",
     ]
   }
+  compute_bindings = {
+    "roles/compute.serviceAgent" = [
+      data.google_compute_default_service_account.default.member,
+    ]
+  }
   eventarc_bindings = {
     "roles/eventarc.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-eventarc.iam.gserviceaccount.com",
@@ -72,9 +77,6 @@ locals {
     member = "serviceAccount:service-${var.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
   }
   base_bindings = {
-    "roles/compute.serviceAgent" = [
-      data.google_compute_default_service_account.default.member,
-    ]
     "roles/logging.serviceAgent" = [
       "serviceAccount:service-${var.project.number}@gcp-sa-logging.iam.gserviceaccount.com",
     ]
@@ -96,6 +98,7 @@ locals {
     local.base_bindings,
     var.enable_artifactregistry ? local.artifactregistry_bindings : {},
     var.enable_bigquery ? local.bigquery_bindings : {},
+    var.enable_compute ? local.compute_bindings : {},
     var.enable_eventarc ? local.eventarc_bindings : {},
     var.enable_gke ? local.gke_bindings : {},
     var.enable_memorystore ? local.memorystore_bindings : {},

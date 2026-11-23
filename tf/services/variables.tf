@@ -8,6 +8,11 @@ variable "enable_bigquery" {
   default = false
 }
 
+variable "enable_compute" {
+  type    = bool
+  default = false
+}
+
 variable "enable_eventarc" {
   type    = bool
   default = false

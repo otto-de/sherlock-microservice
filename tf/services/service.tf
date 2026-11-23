@@ -2,6 +2,10 @@ data "google_compute_default_service_account" "default" {
   depends_on = [
     google_project_service.compute
   ]
+
+  lifecycle {
+    enabled = var.enable_compute
+  }
 }
 
 resource "google_project_service" "artifactregistry" {
@@ -76,6 +80,10 @@ resource "google_project_service" "compute" {
   service = "compute.googleapis.com"
 
   disable_on_destroy = false
+
+  lifecycle {
+    enabled = var.enable_compute
+  }
 }
 
 resource "google_project_service" "container" {
