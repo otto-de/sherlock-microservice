@@ -4,6 +4,7 @@ module "defs" {
 
   enable_artifactregistry = var.enable_artifactregistry
   enable_bigquery         = var.enable_bigquery
+  enable_compute          = var.enable_compute
   enable_eventarc         = var.enable_eventarc
   enable_gke              = var.enable_gke
   enable_memorystore      = var.enable_memorystore
