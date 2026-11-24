@@ -1,10 +1,14 @@
+locals {
+  enable_compute = var.enable_compute || var.enable_gke
+}
+
 data "google_compute_default_service_account" "default" {
   depends_on = [
     google_project_service.compute
   ]
 
   lifecycle {
-    enabled = var.enable_compute
+    enabled = local.enable_compute
   }
 }
 
@@ -82,7 +86,7 @@ resource "google_project_service" "compute" {
   disable_on_destroy = false
 
   lifecycle {
-    enabled = var.enable_compute
+    enabled = local.enable_compute
   }
 }
 
@@ -90,6 +94,10 @@ resource "google_project_service" "container" {
   service = "container.googleapis.com"
 
   disable_on_destroy = false
+
+  depends_on = [
+    google_project_service.compute,
+  ]
 
   lifecycle {
     enabled = var.enable_gke

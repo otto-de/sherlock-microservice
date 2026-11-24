@@ -96,9 +96,9 @@ locals {
   }
   bindings = merge(
     local.base_bindings,
+    local.enable_compute ? local.compute_bindings : {},
     var.enable_artifactregistry ? local.artifactregistry_bindings : {},
     var.enable_bigquery ? local.bigquery_bindings : {},
-    var.enable_compute ? local.compute_bindings : {},
     var.enable_eventarc ? local.eventarc_bindings : {},
     var.enable_gke ? local.gke_bindings : {},
     var.enable_memorystore ? local.memorystore_bindings : {},
