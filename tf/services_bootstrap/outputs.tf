@@ -1,29 +1,29 @@
-output "dns_service" {
-  value = module.defs.dns_service
+output "dns" {
+  value = module.defs.dns
 
   depends_on = [
     google_project_iam_binding.default,
   ]
 }
 
-output "logging_service" {
-  value = module.defs.logging_service
+output "logging" {
+  value = module.defs.logging
 
   depends_on = [
     google_project_iam_binding.default,
   ]
 }
 
-output "secretmanager_service" {
-  value = module.defs.secretmanager_service
+output "secretmanager" {
+  value = module.defs.secretmanager
 
   depends_on = [
     google_project_iam_binding.default,
   ]
 }
 
-output "servicenetworking_service" {
-  value = module.defs.servicenetworking_service
+output "servicenetworking" {
+  value = module.defs.servicenetworking
 
   depends_on = [
     google_project_iam_binding.default,
