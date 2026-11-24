@@ -1,58 +1,40 @@
-output "dns_service" {
-  value = google_project_service.dns
+output "dns" {
+  value = {
+    service = lookup(local.active_services, "dns", null)
+  }
 }
 
 output "iam_bindings" {
   value = local.bindings
 
   depends_on = [
-    google_project_service.aiplatform,
-    google_project_service.artifactregistry,
-    google_project_service.bigquerydatatransfer,
-    google_project_service.cloudbuild,
-    google_project_service.clouderrorreporting,
-    google_project_service.cloudresourcemanager,
-    google_project_service.cloudtrace,
-    google_project_service.compute,
-    google_project_service.container,
-    google_project_service.containeranalysis,
-    google_project_service.containerscanning,
-    google_project_service.containersecurity,
-    google_project_service.dns,
-    google_project_service.eventarc,
-    google_project_service.eventarcpublishing,
-    google_project_service.iam,
-    google_project_service.iamcredentials,
-    google_project_service.iap,
-    google_project_service.logging,
-    google_project_service.memorystore,
-    google_project_service.ml,
-    google_project_service.networkconnectivity,
-    google_project_service.networkmanagement,
-    google_project_service.notebooks,
-    google_project_service.observability,
-    google_project_service.pubsub,
-    google_project_service.redis,
-    google_project_service.secretmanager,
-    google_project_service.servicenetworking,
-    google_project_service.serviceusage,
-    google_project_service.vpcaccess,
-    google_project_service.workloadidentity,
+    google_project_service.this,
+    google_project_service.dependent,
+    terraform_data.service_identity,
   ]
 }
 
-output "logging_service" {
-  value = google_project_service.logging
+output "logging" {
+  value = {
+    service = lookup(local.active_services, "logging", null)
+  }
 }
 
-output "pubsub_identity" {
-  value = local.pubsub_identity
+output "pubsub" {
+  value = {
+    agents = lookup(local.active_service_agents, "pubsub", [])
+  }
 }
 
-output "secretmanager_service" {
-  value = google_project_service.secretmanager
+output "secretmanager" {
+  value = {
+    service = lookup(local.active_services, "secretmanager", null)
+  }
 }
 
-output "servicenetworking_service" {
-  value = google_project_service.servicenetworking
+output "servicenetworking" {
+  value = {
+    agents  = lookup(local.active_service_agents, "servicenetworking", [])
+    service = lookup(local.active_services, "servicenetworking", null)
+  }
 }

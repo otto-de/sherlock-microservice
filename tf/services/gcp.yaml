@@ -1,0 +1,175 @@
+# GCP service configuration. Added manually since the config provided by Google is beta,
+# incomplete and has edge cases.
+# With this hardcoded configuration, tofu is able to predict, which permissions save
+# this results in.
+#
+# Every entry enables the API `<name>.googleapis.com`.
+# - `enabledBy`: feature (`enable_<enabledBy>` variable) that enables the service.
+#   Defaults to the service name. Services without such a feature are always enabled.
+# - `dependsOn`: services that have to be enabled first. They need to have no `dependsOn` themselves.
+# - `createIdentity`: run `gcloud beta services identity create` for the service.
+# - `agents`: IAM roles of the service agents.
+#   `{project_number}` in emails is replaced by the project number.
+services:
+  - name: aiplatform
+    enabledBy: ml
+    createIdentity: true
+    agents:
+      - role: roles/aiplatform.customCodeServiceAgent
+        emails:
+          - service-{project_number}@gcp-sa-aiplatform-cc.iam.gserviceaccount.com
+      - role: roles/aiplatform.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-aiplatform.iam.gserviceaccount.com
+          - service-{project_number}@gcp-sa-aiplatform-ft.iam.gserviceaccount.com
+          - service-{project_number}@gcp-sa-aiplatform-pie.iam.gserviceaccount.com
+      - role: roles/aiplatform.telemetryServiceAgent
+        emails:
+          - service-{project_number}@gcp-sa-vertex-telemetry.iam.gserviceaccount.com
+  - name: artifactregistry
+    createIdentity: true
+    agents:
+      - role: roles/artifactregistry.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-artifactregistry.iam.gserviceaccount.com
+  - name: bigquerydatatransfer
+    enabledBy: bigquery
+    createIdentity: true
+    agents:
+      - role: roles/bigquerydatatransfer.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com
+  - name: cloudbuild
+    enabledBy: ml
+    createIdentity: true
+    agents:
+      - role: roles/cloudbuild.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-cloudbuild.iam.gserviceaccount.com
+  - name: clouderrorreporting
+  - name: cloudresourcemanager
+  - name: cloudtrace
+  - name: compute
+    enabledBy: compute
+    agents:
+      - role: roles/compute.serviceAgent
+        emails:
+          - "{project_number}-compute@developer.gserviceaccount.com"
+  - name: container
+    enabledBy: gke
+    dependsOn: [compute]
+    createIdentity: true
+    agents:
+      - role: roles/container.defaultNodeServiceAgent
+        emails:
+          - service-{project_number}@gcp-sa-gkenode.iam.gserviceaccount.com
+      - role: roles/container.nodeServiceAgent
+        emails:
+          - service-{project_number}@gcp-sa-gkenode.iam.gserviceaccount.com
+      - role: roles/container.serviceAgent
+        emails:
+          - service-{project_number}@container-engine-robot.iam.gserviceaccount.com
+  - name: containeranalysis
+    enabledBy: artifactregistry
+    createIdentity: true
+    agents:
+      - role: roles/containeranalysis.ServiceAgent
+        emails:
+          - service-{project_number}@container-analysis.iam.gserviceaccount.com
+  - name: containerscanning
+    enabledBy: artifactregistry
+    createIdentity: true
+    agents:
+      - role: roles/containerscanning.ServiceAgent
+        emails:
+          - service-{project_number}@gcp-sa-containerscanning.iam.gserviceaccount.com
+  - name: containersecurity
+    enabledBy: gke
+  - name: dns
+    createIdentity: true
+    agents:
+      - role: roles/dns.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-dns.iam.gserviceaccount.com
+  - name: eventarc
+    createIdentity: true
+    agents:
+      - role: roles/eventarc.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-eventarc.iam.gserviceaccount.com
+  - name: eventarcpublishing
+    enabledBy: eventarc
+  - name: iam
+  - name: iamcredentials
+  - name: iap
+  - name: logging
+    createIdentity: true
+    agents:
+      - role: roles/logging.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-logging.iam.gserviceaccount.com
+  - name: memorystore
+    createIdentity: true
+    agents:
+      - role: roles/memorystore.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-memorystore.iam.gserviceaccount.com
+  - name: ml
+    createIdentity: true
+    agents:
+      - role: roles/ml.serviceAgent
+        emails:
+          - service-{project_number}@cloud-ml.google.com.iam.gserviceaccount.com
+  - name: networkconnectivity
+    createIdentity: true
+    agents:
+      - role: roles/networkconnectivity.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-networkconnectivity.iam.gserviceaccount.com
+  - name: networkmanagement
+    createIdentity: true
+    agents:
+      - role: roles/networkmanagement.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-networkmanagement.iam.gserviceaccount.com
+  - name: notebooks
+    enabledBy: ml
+    createIdentity: true
+    agents:
+      - role: roles/notebooks.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-notebooks.iam.gserviceaccount.com
+  - name: observability
+  - name: pubsub
+    createIdentity: true
+    agents:
+      - role: roles/pubsub.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com
+  - name: redis
+    createIdentity: true
+    agents:
+      - role: roles/redis.serviceAgent
+        emails:
+          - service-{project_number}@cloud-redis.iam.gserviceaccount.com
+  - name: secretmanager
+  # Setting the role for some reason fails
+  # createIdentity: true
+    # agents:
+    #   - role: roles/secretmanager.serviceAgent
+    #     emails:
+    #       - service-{project_number}@gcp-sa-secretmanager.iam.gserviceaccount.com
+  - name: servicenetworking
+    createIdentity: true
+    agents:
+      - role: roles/servicenetworking.serviceAgent
+        emails:
+          - service-{project_number}@service-networking.iam.gserviceaccount.com
+  - name: serviceusage
+  - name: vpcaccess
+    createIdentity: true
+    agents:
+      - role: roles/vpcaccess.serviceAgent
+        emails:
+          - service-{project_number}@gcp-sa-vpcaccess.iam.gserviceaccount.com
+  - name: workloadidentity

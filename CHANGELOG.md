@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.0.141 Central GCP service configuration for the Terraform modules
+- `tf/services` now reads services, feature flags, service identities and service agent IAM roles from `gcp.yaml` instead of one hand-written resource per service.
+- Existing `google_project_service.<name>` resources are migrated via `moved` blocks, so no recreation is expected.
+- The compute API (and its service agent role) is only enabled with `enable_compute` or `enable_gke`; `container` is enabled after `compute`.
+- Breaking: the outputs of `tf/services` and `tf/services_bootstrap` were renamed and restructured:
+  - `dns_service`, `logging_service`, `secretmanager_service` and `servicenetworking_service` are now `dns`, `logging`, `secretmanager` and `servicenetworking`, each an object with a `service` attribute (`null` if not enabled).
+  - `pubsub_identity` is replaced by `pubsub`, with an `agents` list of `{member}` objects.
+  - `servicenetworking` additionally exposes `agents`.
+
 ## v0.0.133 Migrate to cloud.google.com/go/pubsub/v2
 - Anything PubSub in the gcp module is now v2, so consumers need to be on v2 to use it.
 
